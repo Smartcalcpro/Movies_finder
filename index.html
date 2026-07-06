@@ -94,11 +94,6 @@
       <button class="btn-exit" onclick="exitApp()">Exit</button>
     </div>
 
-     <!-- Info Box added here -->
-    <div class="info-box">
-      ⚠️ সকল সাইট একসাথে খুলতে 'Search All' ব্যবহার করুন।
-    </div>
-
     <button class="btn-help" onclick="showHelpSupport()">Help</button>
 
     <div class="footer-container">
@@ -128,51 +123,31 @@
 
   // ২. সার্চ লজিক
   function searchMovies() {
-if (!movieData) {
-    alert("ডাটা লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...");
-    return;
-}
-
-if (!Array.isArray(movieData.websites)) {
-    alert("Invalid movies list.");
-    return;
-}
     const query = document.getElementById('movie-query').value.trim();
-    if (!query) return alert('মুভির নাম লিখুন');
+    
+    // মুভির নাম না থাকলে সতর্ক করা
+    if (!query) {
+        alert('মুভির নাম লিখুন');
+        return;
+    }
 
-    // Enabled এবং Priority অনুযায়ী সর্ট করা
-    const sitesToOpen = movieData.websites
-      .filter(s => s.enabled)
-      .sort((a, b) => a.priority - b.priority);
+    // JSON ডাটা চেক করা (ডাটা লোড না হলে ফাংশন কাজ করবে না)
+    if (!movieData || movieData.length === 0) {
+        alert("ডাটা লোড হয়নি, অপেক্ষা করুন...");
+        return;
+    }
 
-     if (sitesToOpen.length === 0) {
-    alert("No enabled websites found.");
-    return;
-}
-
-    sitesToOpen.forEach((site, index) => {
-      const targetUrl = (site.searchUrl && site.searchUrl.trim() !== "") 
-                        ? site.searchUrl + encodeURIComponent(query) 
-                        : site.homeUrl;
-
-      // ৫০০ মিলিসেকেন্ডের ব্যবধানে সাইট খোলা
-      setTimeout(() => {
+    // কোনো কন্ডিশন বা বিলম্ব ছাড়াই সরাসরি সব সাইট ওপেন হবে
+    movieData.forEach(site => {
+        const targetUrl = site.site_link + encodeURIComponent(query);
         const win = window.open(targetUrl, '_blank');
+        
+        // উইন্ডো রেফারেন্স সংরক্ষণ করা যাতে 'Close All' কাজ করে
         if (win) {
-          childWindows.push(win);
-
-          // ২ মিনিট (১২০,০০০ মিলি-সেকেন্ড) পর চেক করা
-          setTimeout(() => {
-            if (win && !win.closed) {
-               win.location.href = site.homeUrl;
-            }
-          }, 120000); 
+            childWindows.push(win);
         }
-      }, index * 500);
     });
-  }
-
-
+}
 
     const sites = [
       { name: "Google", url: "https://www.google.com/search?q=" },

@@ -1,22 +1,14 @@
-{
-  "version": "1.3",
-  "lastUpdate": "2026-07-06",
-  "websites": [
-    {
-      "id": 1,
-      "name": "Bollyflix ",
-      "searchUrl": "https://bollyflix.at/",
-      "homeUrl": "https://bollyflix.at/",
-      "enabled": true,
-      "priority": 1
-    },
-    {
-      "id": 2,
-      "name": "Mp4Moviez",
-      "searchUrl": "https://www.mp4moviez.dad/",
-      "homeUrl": "https://www.mp4moviez.dad/",
-      "enabled": true,
-      "priority": 2
-    }
-  ]
-}
+[
+  {
+    "site_name": "Bollyflix",
+    "site_link": "https://bollyflix.at/?s="
+  },
+  {
+    "site_name": "Mp4moviez",
+    "site_link": "https://www.mp4moviez.dad/?s="
+  },
+  {
+    "site_name": "Filmyfly",
+    "site_link": "https://filmyfly.luxe/?s="
+  }
+]
