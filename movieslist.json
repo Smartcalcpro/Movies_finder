@@ -5,7 +5,7 @@
     {
       "id": 1,
       "name": "Bollyflix ",
-      "searchUrl": "",
+      "searchUrl": "https://bollyflix.at/",
       "homeUrl": "https://bollyflix.at/",
       "enabled": true,
       "priority": 1
@@ -13,7 +13,7 @@
     {
       "id": 2,
       "name": "Mp4Moviez",
-      "searchUrl": "",
+      "searchUrl": "https://www.mp4moviez.dad/",
       "homeUrl": "https://www.mp4moviez.dad/",
       "enabled": true,
       "priority": 2
