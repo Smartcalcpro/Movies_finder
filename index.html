@@ -133,6 +133,7 @@ hardcodedSites.forEach(s => {
 });
 
 // ৩. JSON ব্যবহার করে সবগুলোতে একসাথে সার্চ করা
+
 async function searchMovies() {
     const query = document.getElementById('movie-query').value.trim();
     if (!query) { alert('অনুগ্রহ করে একটি মুভির নাম লিখুন!'); return; }
@@ -140,11 +141,15 @@ async function searchMovies() {
     try {
         const response = await fetch('movieslist.json');
         if (!response.ok) throw new Error("File not found");
-        const sites = await response.json();
+        
+        // এখানে ডাটা লোড হচ্ছে
+        const data = await response.json();
+        const siteList = data.sites; // আপনার JSON স্ট্রাকচার অনুযায়ী 'sites' অ্যারেটি নেওয়া হলো
 
-        if(confirm(`${sites.length} টি সাইটে সার্চ শুরু করতে চান?`)) {
-            sites.forEach((site, index) => {
-                // এখানে JSON-এর 'site_link' প্রপার্টি ব্যবহার করা হচ্ছে
+        if(confirm(`${siteList.length} টি সাইটে সার্চ শুরু করতে চান?`)) {
+            siteList.forEach((site, index) => {
+                // এখানে site_link এর শেষে কী যোগ হবে তা নিশ্চিত করুন
+                // যদি site_link এমন হয়: "https://example.com/search?q=", তবে ঠিক আছে
                 const targetUrl = site.site_link + encodeURIComponent(query);
                 
                 setTimeout(() => {

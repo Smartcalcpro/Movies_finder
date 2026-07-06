@@ -1,14 +1,23 @@
-[
-  {
-    "site_name": "Bollyflix",
-    "site_link": "https://bollyflix.at/?s="
+{
+  "metadata": {
+    "version": "1.0.0",
+    "updated_at": "06-Jul-2026"
   },
-  {
-    "site_name": "Mp4moviez",
-    "site_link": "https://www.mp4moviez.dad/?s="
-  },
-  {
-    "site_name": "Filmyfly",
-    "site_link": "https://filmyfly.luxe/?s="
-  }
-]
+  "sites": [
+    {
+      "id": 1,
+      "site_name": "Bollyflix",
+      "site_link": "https://bollyflix.at/?s="
+    },
+    {
+      "id": 2,
+      "site_name": "Mp4moviez",
+      "site_link": "https://www.mp4moviez.dad/?s="
+    },
+    {
+      "id": 3,
+      "site_name": "Filmyfly",
+      "site_link": "https://filmyfly.luxe/?s="
+    }
+  ]
+}
