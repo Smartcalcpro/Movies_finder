@@ -106,48 +106,57 @@
       let movieData = null;
       let childWindows = [];
 
-  // ১. অ্যাপ খোলার সাথে সাথে JSON লোড
-  document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      const response = await fetch('movieslist.json');
-         if (!response.ok) {
-         throw new Error("movieslist.json not found");
-                       }
-         movieData = await response.json();
-      console.log("JSON Loaded");
-    } catch (error) {
-      console.error("Error loading JSON:", error);
-      alert("movieslist.json লোড করা যায়নি।");
-    }
-  });
-
-  // ২. সার্চ লজিক
-  function searchMovies() {
+      async function searchMovies() {
     const query = document.getElementById('movie-query').value.trim();
     
-    // মুভির নাম না থাকলে সতর্ক করা
     if (!query) {
         alert('মুভির নাম লিখুন');
         return;
     }
 
-    // JSON ডাটা চেক করা (ডাটা লোড না হলে ফাংশন কাজ করবে না)
-    if (!movieData || movieData.length === 0) {
-        alert("ডাটা লোড হয়নি, অপেক্ষা করুন...");
-        return;
-    }
+    try {
+        // ১. JSON ফাইল থেকে ডাটা ফেচ করা
+        const response = await fetch('movieslist.json');
+        const sites = await response.json();
 
-    // কোনো কন্ডিশন বা বিলম্ব ছাড়াই সরাসরি সব সাইট ওপেন হবে
-    movieData.forEach(site => {
-        const targetUrl = site.site_link + encodeURIComponent(query);
-        const win = window.open(targetUrl, '_blank');
+        // ২. নতুন একটি উইন্ডো খোলা (User Action)
+        const win = window.open("", "_blank");
         
-        // উইন্ডো রেফারেন্স সংরক্ষণ করা যাতে 'Close All' কাজ করে
-        if (win) {
-            childWindows.push(win);
-        }
-    });
+        // ৩. নতুন উইন্ডোর ভেতর রেজাল্ট পেজ তৈরি করা
+        win.document.write(`
+            <html>
+            <head>
+                <title>Searching for: ${query}</title>
+                <style>
+                    body { font-family: sans-serif; padding: 20px; }
+                    .result-link { display: block; padding: 10px; margin: 5px; 
+                                   border: 1px solid #ccc; text-decoration: none; color: blue; }
+                </style>
+            </head>
+            <body>
+                <h3>Results for: ${query}</h3>
+                <div id="links"></div>
+            </body>
+            </html>
+        `);
+
+        // ৪. সব সাইটের জন্য লিংক তৈরি করা
+        const linkContainer = win.document.getElementById('links');
+        sites.forEach(site => {
+            const a = win.document.createElement('a');
+            a.className = 'result-link';
+            a.href = site.site_link + encodeURIComponent(query);
+            a.target = "_blank";
+            a.innerText = "Search on " + site.site_name;
+            linkContainer.appendChild(a);
+        });
+
+    } catch (error) {
+        console.error("Error loading JSON:", error);
+        alert("ডাটা লোড করতে সমস্যা হয়েছে!");
+    }
 }
+
 
     const sites = [
       { name: "Google", url: "https://www.google.com/search?q=" },
