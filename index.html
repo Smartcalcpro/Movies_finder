@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Movie World</title>
+  <style>
+    :root {
+      --accent: #6366f1;
+      --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    }
+        body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg-gradient);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Aligns content toward the top */
+  min-height: 100vh;
+  margin: 0;
+  padding-top: 5vh; /* Adjust this value: higher % moves it further down, lower % moves it higher up */
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      box-sizing: border-box; /* Ensures padding stays within the 400px width */
+      text-align: center;
+    }
+
+    
+    /* Search Input */
+    input {
+      width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #ddd;
+      border-radius: 8px; box-sizing: border-box; font-size: 1rem;
+    }
+
+    .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+    .site-card {
+      background: #f1f5f9; padding: 10px; border-radius: 10px;
+      cursor: pointer; font-size: 0.85rem; font-weight: bold;
+      display: flex; align-items: center; justify-content: center; gap: 8px; border: 2px solid #e2e8f0; transition: all 0.2s ease; }
+    
+    .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+    button { padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .btn-main { background: var(--accent); color: white; width: 100%; }
+    .btn-close { background: #ef4444; color: white; }
+    .btn-exit { background: #ef4444; color: white; }
+    .btn-help { background: #64748b; color: white; width: 100%; margin-top: 10px; }
+    
+     /* Info Box Style */
+    .info-box {
+      margin-top: 15px;
+      padding: 10px;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #0369a1;
+      text-align: center;
+    }
+
+
+    /* Footer: No background, black text, scrolling */
+    .footer-container { margin-top: 20px; overflow: hidden; width: 100%; }
+    .scroll-text { 
+      white-space: nowrap; animation: marquee 15s linear infinite;
+      font-size: 0.9rem; font-weight: bold; color: #000; 
+    }
+    @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1 style="margin:0">🍿 Movie World</h1>
+<div id="timer" style="font-size: 1.0rem; color: #ef4444; font-weight: bold; margin: 10px 0;">Session: 00:00</div>
+
+
+    <input type="text" id="movie-query" placeholder="Enter movie name..." />
+    <button class="btn-main" onclick="searchMovies()">Search All</button>
+
+    <div class="grid-container" id="site-grid"></div>
+
+    <div class="btn-group">
+      <button class="btn-close" onclick="closeAll()">Close All</button>
+      <button class="btn-exit" onclick="exitApp()">Exit</button>
+    </div>
+
+     <!-- Info Box added here -->
+    <div class="info-box">
+      ⚠️ সকল সাইট একসাথে খুলতে 'Search All' ব্যবহার করুন।
+    </div>
+
+    <button class="btn-help" onclick="showHelpSupport()">Help</button>
+
+    <div class="footer-container">
+      <div class="scroll-text">🌐 A.Rana Productions - Modern Movie Search Tool 🌐</div>
+    </div>
+  </div>
+
+  <script>
+
+      let movieData = null;
+      let childWindows = [];
+
+  // ১. অ্যাপ খোলার সাথে সাথে JSON লোড
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const response = await fetch('movieslist.json');
+         if (!response.ok) {
+         throw new Error("movieslist.json not found");
+                       }
+         movieData = await response.json();
+      console.log("JSON Loaded");
+    } catch (error) {
+      console.error("Error loading JSON:", error);
+      alert("movieslist.json লোড করা যায়নি।");
+    }
+  });
+
+  // ২. সার্চ লজিক
+  function searchMovies() {
+if (!movieData) {
+    alert("ডাটা লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...");
+    return;
+}
+
+if (!Array.isArray(movieData.websites)) {
+    alert("Invalid movies list.");
+    return;
+}
+    const query = document.getElementById('movie-query').value.trim();
+    if (!query) return alert('মুভির নাম লিখুন');
+
+    // Enabled এবং Priority অনুযায়ী সর্ট করা
+    const sitesToOpen = movieData.websites
+      .filter(s => s.enabled)
+      .sort((a, b) => a.priority - b.priority);
+
+     if (sitesToOpen.length === 0) {
+    alert("No enabled websites found.");
+    return;
+}
+
+    sitesToOpen.forEach((site, index) => {
+      const targetUrl = (site.searchUrl && site.searchUrl.trim() !== "") 
+                        ? site.searchUrl + encodeURIComponent(query) 
+                        : site.homeUrl;
+
+      // ৫০০ মিলিসেকেন্ডের ব্যবধানে সাইট খোলা
+      setTimeout(() => {
+        const win = window.open(targetUrl, '_blank');
+        if (win) {
+          childWindows.push(win);
+
+          // ২ মিনিট (১২০,০০০ মিলি-সেকেন্ড) পর চেক করা
+          setTimeout(() => {
+            if (win && !win.closed) {
+               win.location.href = site.homeUrl;
+            }
+          }, 120000); 
+        }
+      }, index * 500);
+    });
+  }
+
+
+
+    const sites = [
+      { name: "Google", url: "https://www.google.com/search?q=" },
+      { name: "DuckDuckGo", url: "https://duckduckgo.com/?q=" },
+      { name: "YouTube", url: "https://www.youtube.com/results?search_query=" },
+      { name: "YT Music", url: "https://music.youtube.com/search?q=" },
+      { name: "MX Player", url: "https://www.mxplayer.in/search/" },
+      { name: "Zee5", url: "https://www.zee5.com/search?q=" },
+      { name: "Wikipedia", url: "https://bn.wikipedia.org/wiki/" }
+    ];
+
+    const grid = document.getElementById('site-grid');
+    
+    sites.forEach(s => {
+      const div = document.createElement('div');
+      div.className = 'site-card';
+      
+      // Add the logo image and the name side-by-side
+      div.innerHTML = `
+        <img src="https://www.google.com/s2/favicons?domain=${s.url}" width="16" height="16" alt="">
+        ${s.name}
+      `;
+      
+      div.onclick = () => {
+        const win = window.open(s.url, '_blank');
+        childWindows.push(win);
+      };
+      grid.appendChild(div);
+    });
+
+
+     // Timer Script
+  let seconds = 0;
+  setInterval(() => {
+    seconds++;
+    let mins = Math.floor(seconds / 60);
+    let secs = seconds % 60;
+    document.getElementById('timer').innerText = `Session: ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }, 1000);
+
+    function showHelpSupport() {
+  const message = `Movie World একটি আধুনিক ওয়েব টুল, যা আপনার প্রিয় মুভি এবং কন্টেন্ট খুঁজে পাওয়ার প্রক্রিয়াকে করেছে আরও সহজ ও দ্রুত।
+
+কোনো প্রয়োজনে সরাসরি যোগাযোগ করুন:
+📧 moviesearching@gmail.com`;
+
+  alert(message);
+}
+
+    function closeAll() {
+      childWindows.forEach(win => { if(win && !win.closed) win.close(); });
+      childWindows = [];
+    }
+
+    function exitApp() { window.close(); }
+  </script>
+</body>
+</html>
