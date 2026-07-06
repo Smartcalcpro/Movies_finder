@@ -108,51 +108,25 @@
 
       async function searchMovies() {
     const query = document.getElementById('movie-query').value.trim();
-    
-    if (!query) {
-        alert('মুভির নাম লিখুন');
-        return;
-    }
+    if (!query) { alert('মুভির নাম লিখুন'); return; }
 
     try {
-        // ১. JSON ফাইল থেকে ডাটা ফেচ করা
         const response = await fetch('movieslist.json');
         const sites = await response.json();
 
-        // ২. নতুন একটি উইন্ডো খোলা (User Action)
-        const win = window.open("", "_blank");
-        
-        // ৩. নতুন উইন্ডোর ভেতর রেজাল্ট পেজ তৈরি করা
-        win.document.write(`
-            <html>
-            <head>
-                <title>Searching for: ${query}</title>
-                <style>
-                    body { font-family: sans-serif; padding: 20px; }
-                    .result-link { display: block; padding: 10px; margin: 5px; 
-                                   border: 1px solid #ccc; text-decoration: none; color: blue; }
-                </style>
-            </head>
-            <body>
-                <h3>Results for: ${query}</h3>
-                <div id="links"></div>
-            </body>
-            </html>
-        `);
-
-        // ৪. সব সাইটের জন্য লিংক তৈরি করা
-        const linkContainer = win.document.getElementById('links');
-        sites.forEach(site => {
-            const a = win.document.createElement('a');
-            a.className = 'result-link';
-            a.href = site.site_link + encodeURIComponent(query);
-            a.target = "_blank";
-            a.innerText = "Search on " + site.site_name;
-            linkContainer.appendChild(a);
-        });
-
+        // ইউজারকে একটি কনফার্মেশন দেওয়া (এটি ব্রাউজারকে বোঝায় যে ইউজার এটি করতে ইচ্ছুক)
+        if(confirm(`${sites.length} টি সাইটে সার্চ করতে চান?`)) {
+            sites.forEach((site, index) => {
+                const targetUrl = site.site_link + encodeURIComponent(query);
+                
+                // ব্রাউজারকে পপ-আপ ব্লক করা থেকে বিরত রাখতে প্রতিটি উইন্ডো খোলার সময় সামান্য বিরতি দেওয়া
+                setTimeout(() => {
+                    const win = window.open(targetUrl, '_blank');
+                    if (win) childWindows.push(win);
+                }, index * 200); 
+            });
+        }
     } catch (error) {
-        console.error("Error loading JSON:", error);
         alert("ডাটা লোড করতে সমস্যা হয়েছে!");
     }
 }
