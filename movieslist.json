@@ -1,23 +1,63 @@
 {
   "metadata": {
-    "version": "1.0.0",
-    "updated_at": "06-Jul-2026"
+    "version": "1.0.2",
+    "updated_at": "07-Jul-2026"
   },
   "sites": [
     {
       "id": 1,
       "site_name": "Bollyflix",
-      "site_link": "https://bollyflix.at/?s="
+      "site_link": "https://bollyflix.at/search/"
     },
     {
       "id": 2,
       "site_name": "Mp4moviez",
-      "site_link": "https://www.mp4moviez.dad/?s="
+      "site_link": "https://www.mp4moviez.dad/search/"
     },
     {
       "id": 3,
       "site_name": "Filmyfly",
-      "site_link": "https://filmyfly.luxe/?s="
+      "site_link": "https://filmyfly.luxe/search.html?search="
+    },
+    {
+      "id": 4,
+      "site_name": "Vegamovie",
+      "site_link": "https://vegamovie.ss/#"
+    },
+    {
+      "id": 5,
+      "site_name": "HDHUB4U",
+      "site_link": "https://new2.hdhub4u.cl/search.html?q="
+    },
+    {
+      "id": 6,
+      "site_name": "Mx Player ",
+      "site_link": "https://www.google.com/url?sa="
+    },
+    {
+      "id": 7,
+      "site_name": "SD MOVIES POINT",
+      "site_link": "https://sd3.sdmoviespoint.trade/?s="
+    },
+    {
+      "id": 8,
+      "site_name": "Jalshamoviez",
+      "site_link": "https://www.jalshamoviez.diy/mobile/search?find="
+    },
+    {
+      "id": 9,
+      "site_name": "MOVIES MOD",
+      "site_link": "https://moviesmod.at/search/"
+    },
+    {
+      "id": 10,
+      "site_name": "KatMovieHD",
+      "site_link": "https://new.katmoviehd.top/?s="
+    },
+    {
+      "id": 11,
+      "site_name": "MoviesNation",
+      "site_link": "https://moviesnation.fans/"
     }
   ]
 }
