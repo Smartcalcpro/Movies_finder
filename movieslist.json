@@ -1,63 +1,93 @@
 {
   "metadata": {
-    "version": "1.0.2",
+    "version": "1.0.5",
     "updated_at": "07-Jul-2026"
   },
   "sites": [
     {
       "id": 1,
       "site_name": "Bollyflix",
-      "site_link": "https://bollyflix.at/search/"
+      "site_link": "https://bollyflix.at/search/[movie]"
     },
     {
       "id": 2,
-      "site_name": "Mp4moviez",
-      "site_link": "https://www.mp4moviez.dad/search/"
+      "site_name": "Filmyfly",
+      "site_link": "https://filmyfly.luxe/search.html?search=[movie]"
     },
     {
       "id": 3,
-      "site_name": "Filmyfly",
-      "site_link": "https://filmyfly.luxe/search.html?search="
+      "site_name": "Mp4moviez",
+      "site_link": "https://www.mp4moviez.dad/search/[movie].html"
     },
     {
       "id": 4,
+      "site_name": "HDHUB4U",
+      "site_link": "https://new2.hdhub4u.cl/search.html?q=[movie]"
+    },
+    {
+      "id": 5,
       "site_name": "Vegamovie",
       "site_link": "https://vegamovie.ss/#"
     },
     {
-      "id": 5,
-      "site_name": "HDHUB4U",
-      "site_link": "https://new2.hdhub4u.cl/search.html?q="
-    },
-    {
       "id": 6,
-      "site_name": "Mx Player ",
-      "site_link": "https://www.google.com/url?sa="
+      "site_name": "Mx Player",
+      "site_link": "https://www.mxplayer.in/?search=true&q=[movie]"
     },
     {
       "id": 7,
       "site_name": "SD MOVIES POINT",
-      "site_link": "https://sd3.sdmoviespoint.trade/?s="
+      "site_link": "https://sd3.sdmoviespoint.trade/?s=[movie]"
     },
     {
       "id": 8,
       "site_name": "Jalshamoviez",
-      "site_link": "https://www.jalshamoviez.diy/mobile/search?find="
+      "site_link": "https://www.jalshamoviez.diy/mobile/search?find=[movie]"
     },
     {
       "id": 9,
       "site_name": "MOVIES MOD",
-      "site_link": "https://moviesmod.at/search/"
+      "site_link": "https://moviesmod.at/search/[movie]"
     },
     {
       "id": 10,
       "site_name": "KatMovieHD",
-      "site_link": "https://new.katmoviehd.top/?s="
+      "site_link": "https://new.katmoviehd.top/?s=[movie]"
     },
     {
       "id": 11,
       "site_name": "MoviesNation",
       "site_link": "https://moviesnation.fans/"
+    },
+    {
+      "id": 12,
+      "site_name": "9xmovies.kred",
+      "site_link": "https://9xmovielive.com/"
+    },
+    {
+      "id": 13,
+      "site_name": "Movies4U",
+      "site_link": "https://movies4u.mw/?s=[movie]"
+    },
+    {
+      "id": 14,
+      "site_name": "FilmyZilla",
+      "site_link": "https://www.filmyzilla45.com/"
+    },
+    {
+      "id": 15,
+      "site_name": "9xFlix",
+      "site_link": "https://9xflix.gdn/m/search.html?q=[movie]"
+    },
+    {
+      "id": 16,
+      "site_name": "Downloadhub",
+      "site_link": "https://hubmov.com/"
+    },
+    {
+      "id": 17,
+      "site_name": "Bolly4U",
+      "site_link": "https://bollyhub.info/"
     }
   ]
 }

@@ -104,19 +104,21 @@
   <script>
 
          let childWindows = [];
+         let movieData = null; // এই ভেরিয়েবলটি যোগ করুন
 
-// ১. হার্ডকোড করা সাইটগুলো (নিজেস্বভাবে ওপেন করার জন্য)
+// ১. হার্ডকোড করা সাইটগুলো
 const hardcodedSites = [
-  { name: "Google", url: "https://www.google.com/search?q=" },
-  { name: "DuckDuckGo", url: "https://duckduckgo.com/?q=" },
-  { name: "YouTube", url: "https://www.youtube.com/results?search_query=" },
-  { name: "YT Music", url: "https://music.youtube.com/search?q=" },
-  { name: "MX Player", url: "https://www.mxplayer.in/search/" },
-  { name: "Zee5", url: "https://www.zee5.com/search?q=" },
+  { name: "Google", url: "https://www.google.com/" },
+  { name: "DuckDuckGo", url: "https://duckduckgo.com/" },
+  { name: "YouTube", url: "https://www.youtube.com/" },
+  { name: "YT Music", url: "https://music.youtube.com/" },
+  { name: "MX Player", url: "https://www.mxplayer.in/" },
+  { name: "Mini Tv", url: "https://www.amazon.in/minitv" },
+  { name: "Zee5", url: "https://www.zee5.com/" },
   { name: "Wikipedia", url: "https://bn.wikipedia.org/wiki/" }
 ];
 
-// ২. হার্ডকোড করা সাইটগুলোর কার্ড তৈরি করা
+// ২. হার্ডকোড করা সাইটগুলোর কার্ড তৈরি করা (সংশোধিত)
 const grid = document.getElementById('site-grid');
 hardcodedSites.forEach(s => {
   const div = document.createElement('div');
@@ -125,33 +127,40 @@ hardcodedSites.forEach(s => {
     <img src="https://www.google.com/s2/favicons?domain=${s.url}" width="16" height="16" alt="">
     ${s.name}
   `;
+  
+  // সংশোধিত ক্লিক হ্যান্ডলার: অ্যাপ ওপেন হওয়া আটকাতে about:blank ব্যবহার করা হয়েছে
   div.onclick = () => {
-    const win = window.open(s.url, '_blank');
-    if (win) childWindows.push(win);
+    const win = window.open('about:blank', '_blank');
+    if (win) {
+      win.location.href = s.url; // এখানে লিঙ্ক লোড হলে অ্যান্ড্রয়েড অ্যাপ ইনটেন্ট ট্রিগার করতে পারে না
+      childWindows.push(win);
+    }
   };
   grid.appendChild(div);
 });
 
 // ৩. JSON ব্যবহার করে সবগুলোতে একসাথে সার্চ করা
-
 async function searchMovies() {
     const query = document.getElementById('movie-query').value.trim();
     if (!query) { alert('অনুগ্রহ করে একটি মুভির নাম লিখুন!'); return; }
 
     try {
-        const response = await fetch('movieslist.json');
-        if (!response.ok) throw new Error("File not found");
+        // [নতুন চেক]: যদি movieData ফাঁকা থাকে, তবেই সার্ভার থেকে ফেচ হবে
+        if (movieData === null) {
+            const response = await fetch('movieslist.json');
+            if (!response.ok) throw new Error("File not found");
+            movieData = await response.json();
+        }
         
-        // এখানে ডাটা লোড হচ্ছে
-        const data = await response.json();
-        const siteList = data.sites; // আপনার JSON স্ট্রাকচার অনুযায়ী 'sites' অ্যারেটি নেওয়া হলো
+        // এখন movieData-এর ভেতর ডাটা আছে, সেটি ব্যবহার করুন
+        const siteList = movieData.sites; 
 
         if(confirm(`${siteList.length} টি সাইটে সার্চ শুরু করতে চান?`)) {
-            siteList.forEach((site, index) => {
-                // এখানে site_link এর শেষে কী যোগ হবে তা নিশ্চিত করুন
-                // যদি site_link এমন হয়: "https://example.com/search?q=", তবে ঠিক আছে
-                const targetUrl = site.site_link + encodeURIComponent(query);
-                
+            const encodedQuery = encodeURIComponent(query);
+            const reversedSiteList = [...siteList].reverse();
+
+            reversedSiteList.forEach((site, index) => {
+                const targetUrl = site.site_link.replace("[movie]", encodedQuery);
                 setTimeout(() => {
                     const win = window.open(targetUrl, '_blank');
                     if (win) childWindows.push(win);
@@ -160,10 +169,9 @@ async function searchMovies() {
         }
     } catch (error) {
         console.error(error);
-        alert("দুঃখিত, 'movieslist.json' ফাইলটি পাওয়া যায়নি অথবা ডাটা লোড করতে সমস্যা হয়েছে!");
+        alert("দুঃখিত, ফাইলটি লোড করা যায়নি!");
     }
 }
-
 
      // Timer Script
   let seconds = 0;
