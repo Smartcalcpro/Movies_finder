@@ -94,7 +94,11 @@
       <button class="btn-exit" onclick="exitApp()">Exit</button>
     </div>
 
-    <button class="btn-help" onclick="showHelpSupport()">Help</button>
+    <button class="btn-help" onclick="showHelpSupport()">About</button>
+
+    <button class="btn-help" onclick="sendEmail()" style="background-color: #5bb450; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+    Contact Us (Help)
+</button>
 
     <div class="footer-container">
       <div class="scroll-text">🌐 A.Rana Productions - Modern Movie Search Tool 🌐</div>
@@ -190,6 +194,22 @@ async function searchMovies() {
 
   alert(message);
 }
+    
+    function sendEmail() {
+            // আপনার ইমেইল ঠিকানা এখানে বসান
+            var email = "dadamanchu804@gmail.com"; 
+            var subject = "Movie Search App Suggestion";
+            var body = "আপনার পরামর্শ এখানে লিখুন...";
+            
+            // mailto লিঙ্ক তৈরি
+            var mailtoLink = "mailto:" + email + 
+                             "?subject=" + encodeURIComponent(subject) + 
+                             "&body=" + encodeURIComponent(body);
+            
+            // লিঙ্ক ওপেন করা
+            window.location.href = mailtoLink;
+        }
+
 
     function closeAll() {
       childWindows.forEach(win => { if(win && !win.closed) win.close(); });
