@@ -218,6 +218,13 @@ input:checked + .slider:before { transform: translateX(20px); }
       font-size: 0.9rem; font-weight: bold; color: #000; 
     }
     @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+/* বডি লক করার ক্লাস */
+.no-scroll {
+  overflow: hidden;
+  height: 100vh;
+}
+
   </style>
 </head>
 <body>
@@ -610,22 +617,25 @@ function resetForm() {
     generateNewId(); // নতুন আইডি জেনারেট হবে
 }
 
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+// পপআপ ওপেন করার সময় বডি লক করা
+function openModal(id) { 
+    document.getElementById(id).style.display = 'flex'; 
+    document.body.classList.add('no-scroll'); // এই লাইনটি যোগ করুন
+}
 
+// পপআপ বন্ধ করার সময় বডি আনলক করা
 function closeModal(id) { 
-    // শুধুমাত্র 'editorModal' বন্ধ করার সময় এই সতর্কতা আসবে
     if (id === 'editorModal') {
         const confirmSave = confirm("আপনি কি ডাটা 'Export' করে নিয়েছেন? এটি টেম্পোরারি মেমোরি, পপআপ বন্ধ করলে ডাটা হারিয়ে যেতে পারে।");
-        
-        // যদি ইউজার 'Cancel' করে, তবে পপআপ বন্ধ হবে না
         if (!confirmSave) {
             return; 
         }
     }
     
-    // অন্য সব মডালের ক্ষেত্রে সরাসরি বন্ধ হয়ে যাবে
     document.getElementById(id).style.display = 'none'; 
+    document.body.classList.remove('no-scroll'); // এই লাইনটি যোগ করুন
 }
+
      
 
     function closeAll() {
