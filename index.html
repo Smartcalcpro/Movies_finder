@@ -288,6 +288,21 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 <button style="background-color: #2323ff; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer;" onclick="importJSON()">Import</button>
     </div>
+    
+    <button onclick="processYoutubeLink()" style="
+    width: 100%;
+    padding: 10px; 
+    font-size: 13px; 
+    cursor: pointer; 
+    background-color: #8B4513; 
+    color: white; 
+    border: none; 
+    border-radius: 5px;
+    font-weight: bold;
+    margin-bottom: 20px;">
+    Download Youtube Video
+</button>
+
     <button style="background-color: #ef4444; color: white; margin-top: 10px; width: 50%; padding: 8px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;" onclick="closeModal('editorModal')">Close</button>
 
   </div>
@@ -637,6 +652,34 @@ function closeModal(id) {
 }
 
      
+    function processYoutubeLink() {
+            // This triggers the prompt directly
+            let url = prompt("Enter Your Youtube Link:");
+
+            // Exit if user clicks cancel
+            if (!url) return;
+
+            // Extract the Video ID
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            const videoID = (match && match[2].length === 11) ? match[2] : null;
+
+            if (videoID) {
+                const sites = [
+        `https://v24.www-y2mate.com/en/convert-video/${videoID}`,
+        `https://www.yout.com/watch?v=${videoID}`,
+        `https://www.youtubepi.com/watch?v=${videoID}`,
+        `https://www.youpak.com/watch?v=${videoID}`,
+        `https://ssyoutube.com/watch?v=${videoID}`
+                ];
+
+                // Open the sites
+                sites.forEach(site => window.open(site, '_blank'));
+            } else {
+                alert("Invalid YouTube Link. Please try again.");
+            }
+        }
+
 
     function closeAll() {
       childWindows.forEach(win => { if(win && !win.closed) win.close(); });
