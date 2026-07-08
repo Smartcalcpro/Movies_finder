@@ -652,41 +652,59 @@ function closeModal(id) {
     document.body.classList.remove('no-scroll'); // এই লাইনটি যোগ করুন
 }
 
-     
-    function processYoutubeLink() {
-            // This triggers the prompt directly
-            let url = prompt("Enter Your Youtube Link:");
+     function processYoutubeLink() {
+    // প্রম্পট বক্স থেকে ইউআরএল নেওয়া
+    let url = prompt("Enter Your Youtube Link:");
 
-            // Exit if user clicks cancel
-            if (!url) return;
+    // ইউজার ক্যান্সেল করলে বা খালি রাখলে ফাংশন থেকে বের হয়ে যাওয়া
+    if (!url) return;
 
-            // Extract the Video ID
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            const videoID = (match && match[2].length === 11) ? match[2] : null;
+    // ভিডিও আইডি এক্সট্র্যাক্ট করা
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    const videoID = (match && match[2].length === 11) ? match[2] : null;
 
-            if (videoID) {
-                const sites = [
-        `https://v24.www-y2mate.com/en/convert-video/${videoID}`,
-        `https://www.yout.com/watch?v=${videoID}`,
-        `https://www.youtubepi.com/watch?v=${videoID}`,
-        `https://www.youpak.com/watch?v=${videoID}`,
-        `https://ssyoutube.com/watch?v=${videoID}`
-                ];
+    if (videoID) {
+        const sites = [
+            `https://v24.www-y2mate.com/en/convert-video/${videoID}`,
+            `https://www.yout.com/watch?v=${videoID}`,
+            `https://www.youtubepi.com/watch?v=${videoID}`,
+            `https://www.youpak.com/watch?v=${videoID}`,
+            `https://ssyoutube.com/watch?v=${videoID}`
+        ];
 
-                // Open the sites
-                sites.forEach(site => window.open(site, '_blank'));
-            } else {
-                alert("Invalid YouTube Link. Please try again.");
+        // প্রতিটি সাইট ওপেন করা এবং অ্যারেতে রেফারেন্স রাখা
+        sites.forEach(site => {
+            const win = window.open(site, '_blank');
+            if (win) {
+                childWindows.push(win); // এখানে ট্যাবগুলো অ্যারেতে সেভ হচ্ছে
             }
-        }
-
+        });
+        
+        showToast("YouTube downloader sites opened!");
+    } else {
+        alert("Invalid YouTube Link. Please try again.");
+    }
+}
 
     function closeAll() {
-      childWindows.forEach(win => { if(win && !win.closed) win.close(); });
-      childWindows = [];
-    }
-    
+    // ১. আপনার নিজের ট্র্যাকিং করা উইন্ডোগুলো বন্ধ করার চেষ্টা
+    childWindows.forEach((win) => {
+        if (win && !win.closed) {
+            try {
+                win.close(); 
+            } catch (e) {
+                console.log("উইন্ডোটি ক্লোজ করা সম্ভব হয়নি (নিরাপত্তা সীমাবদ্ধতা):", e);
+            }
+        }
+    });
+
+    // ২. ট্র্যাকিং অ্যারে পরিষ্কার করা
+    childWindows = [];
+    showToast("সব ট্যাব বন্ধ করার চেষ্টা করা হয়েছে!");
+}
+
+        
     function exitApp() {
     // ১. প্রথমে সব খোলা ট্যাবগুলো বন্ধ করবে
     closeAll();
