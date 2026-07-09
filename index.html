@@ -28,6 +28,7 @@
       position: relative;
       background: rgba(255, 255, 255, 0.95);
       padding: 2rem;
+      padding-bottom: 1rem;
       border-radius: 20px;
       box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
       width: 100%;
@@ -212,7 +213,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 
     /* Footer: No background, black text, scrolling */
-    .footer-container { margin-top: 20px; overflow: hidden; width: 100%; }
+    .footer-container { margin-top: 10px;margin-bottom: 8px; overflow: hidden; width: 100%; }
     .scroll-text { 
       white-space: nowrap; animation: marquee 15s linear infinite;
       font-size: 0.9rem; font-weight: bold; color: #000; 
@@ -224,6 +225,59 @@ input:checked + .slider:before { transform: translateX(20px); }
   overflow: hidden;
   height: 100vh;
 }
+
+  .info-boxx {
+            background: #e3f2fd; /* অনেক হালকা নীল */
+            border: 2px solid #2196f3; /* উজ্জ্বল নীল বর্ডার */
+            padding: 5px 10px;
+            border-radius: 12px;
+            color: #0d47a1; /* গাঢ় নীল লেখা যাতে পরিষ্কার দেখা যায় */
+            font-size: 12px;
+            text-align: center;
+            max-width: 100%;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+   .button-container {
+            display: flex;
+            gap: 10px; 
+            margin-bottom: 8px;
+        }
+
+#playBtn { 
+    flex: 2; /* এটি বেশি জায়গা নেবে (লম্বা হবে) */
+    padding: 12px 10px;
+}
+
+#customBtn { 
+    flex: 1; /* এটি কম জায়গা নেবে (ছোট হবে) */
+    padding: 12px 10px;
+}
+
+        
+.btn { 
+    padding: 10px 10px;      /* প্যাডিং কমিয়ে বাটনটি সরু করা হয়েছে */
+    font-size: 14px;         /* ফন্ট সাইজ সামান্য কমানো হয়েছে */
+    color: white; 
+    text-decoration: none; 
+    border-radius: 50px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    border: none;
+    transition: 0.3s;
+    white-space: nowrap;     /* টেক্সট যাতে নিচে না নামে, এক লাইনে থাকে */
+    flex: 1;                 /* বাটনগুলো যেন সমান জায়গা নেয় */
+    display: flex;           /* টেক্সট সেন্টারে রাখার জন্য */
+    align-items: center;
+    justify-content: center;
+}
+
+        #playBtn { background: #ff0000; box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4); }
+        #customBtn { background: #2196f3; box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4); }
+
+        .btn:hover { transform: scale(1.05); }
+
 
   </style>
 </head>
@@ -259,6 +313,21 @@ input:checked + .slider:before { transform: translateX(20px); }
   <button class="btn-help" onclick="openModal('aboutModal')">About</button>
   <button class="btn-help" onclick="sendEmail()" style="background-color: #5bb450;">Contact Us (Help)</button>
 </div>
+
+    <div class="info-boxx">
+        ⚠️ Brave Browser ব্যবহার করুন স্মুথ অভিজ্ঞতার জন্য। <br>
+        না থাকলে প্লে-স্টোর থেকে ইনস্টল করুন।
+    </div>
+
+<div class="button-container">
+        <!-- Default Playlist Button -->
+        <a href="intent://music.youtube.com/playlist?list=PLJpgiXB3EoF4&autoplay=1#Intent;scheme=https;package=com.brave.browser;S.browser_fallback_url=https://music.youtube.com/playlist?list=PLJpgiXB3EoF4;end" 
+           id="playBtn" class="btn">▶︎ Play Ultimate Music</a>
+
+        <!-- Custom Playlist Button (Intent via) -->
+        <button id="customBtn" class="btn" onclick="openCustomIntent()">🔗 Link</button>
+    </div>
+
 
   <div class="footer-container">
     <div class="scroll-text">🌐 A.Rana Productions - Modern Movie Search Tool 🌐</div>
@@ -704,6 +773,22 @@ function closeModal(id) {
     showToast("সব ট্যাব বন্ধ করার চেষ্টা করা হয়েছে!");
 }
 
+function openCustomIntent() {
+            let userLink = prompt("আপনার YouTube প্লেলিস্ট লিংকটি দিন:");
+            
+            if (userLink && userLink.trim() !== "") {
+                // লিংক থেকে https:// অংশটি সরিয়ে শুধু মূল অংশটি নেওয়া
+                let cleanUrl = userLink.replace(/^https?:\/\//, '');
+                
+                // Intent URL তৈরি করা
+                let intentUrl = "intent://" + cleanUrl + (cleanUrl.includes("?") ? "&" : "?") + "autoplay=1#Intent;scheme=https;package=com.brave.browser;S.browser_fallback_url=" + encodeURIComponent(userLink) + ";end";
+                
+                // Intent ট্রিগার করা
+                window.location.href = intentUrl;
+            } else {
+                alert("দয়া করে একটি সঠিক লিংক দিন।");
+            }
+        }
         
     function exitApp() {
     // ১. প্রথমে সব খোলা ট্যাবগুলো বন্ধ করবে
