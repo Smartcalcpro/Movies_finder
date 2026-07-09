@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Movie World</title>
+  <style>
+    :root {
+      --accent: #6366f1;
+      --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    }
+        body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg-gradient);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Aligns content toward the top */
+  min-height: 100vh;
+  margin: 0;
+  padding-top: 3vh; /* Adjust this value: higher % moves it further down, lower % moves it higher up */
+  padding-left: 10px;
+  padding-right: 10px;
+}
+    
+    
+    .card {
+      position: relative;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      padding-bottom: 1rem;
+      border-radius: 20px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      box-sizing: border-box; /* Ensures padding stays within the 400px width */
+      text-align: center;
+    }
+
+    
+    /* Search Input */
+    input {
+      width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #ddd;
+      border-radius: 8px; box-sizing: border-box; font-size: 1rem;
+    }
+
+    .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+    .site-card {
+      background: #f1f5f9; padding: 10px; border-radius: 10px;
+      cursor: pointer; font-size: 0.85rem; font-weight: bold;
+      display: flex; align-items: center; justify-content: center; gap: 8px; border: 2px solid #e2e8f0; transition: all 0.2s ease; }
+    
+    .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; margin-bottom: 5px; }
+    button { padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .btn-main { background: #5bb450; color: white; width: 100%; }
+    .btn-close { background: #ef4444; color: white; }
+    .btn-exit { background: #ef4444; color: white; }
+    .btn-help { background: #64748b; color: white; width: 100%; margin-top: 10px; }
+
+
+/* Modal Style */
+.overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; 
+align-items: flex-start; /* এটি 'center' ছিল, এখন 'flex-start'*/ padding-top: 50px; }
+
+.modal {
+  background: white;
+  padding: 15px;
+  border-radius: 20px;
+  width: 90%;            /* উইডথ ১০০% দিন যাতে এটি মার্জিনের ওপর নির্ভর করে */
+  max-width: 350px;       /* পপআপটি যেন খুব বেশি চওড়া না হয় */
+  margin: 0 15px;         /* এটিই দুই পাশ থেকে সমান ১৫পিক্সেল গ্যাপ তৈরি করবে */
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  box-sizing: border-box; /* এটি প্যাডিং-এর কারণে পপআপের সাইজ বেড়ে যাওয়া আটকাবে */
+}
+
+
+/* --- Night Mode Styles --- */
+body.dark-mode {
+  background: #0f172a;
+}
+
+body.dark-mode .card {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+/* গ্রিড সাইট কার্ড টেক্সট কালো রাখা */
+body.dark-mode .site-card {
+  background: #ffffff; /* ব্যাকগ্রাউন্ড সাদা */
+  color: #000000;      /* টেক্সট কালো */
+}
+
+/* ফুটার টেক্সট কালো রাখা */
+body.dark-mode .scroll-text {
+  color:  #ffffff;      /* ডার্ক মোডেও কালো */
+}
+
+/* ইনপুট বক্স টেক্সট */
+body.dark-mode input {
+  background: #f8fafc;
+  color: #000000;
+}
+
+
+/* --- Toggle Switch Styling --- */
+.theme-switch {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  cursor: pointer;
+  padding: 8px 12px;
+  background: #e2e8f0;
+  border-radius: 20px;
+  font-size: 1rem;
+}
+
+
+/* Slider Style */
+.switch { position: absolute; top: 15px; right: 15px; width: 40px; height: 20px; cursor: pointer; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 30px; }
+.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: #6366f1; }
+input:checked + .slider:before { transform: translateX(20px); }
+
+
+    
+     /* Info Box Style */
+    .info-box {
+      margin-top: 15px;
+      padding: 10px;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #0369a1;
+      text-align: center;
+    }
+
+ /* Settings Icon */
+.settings-icon { position: absolute; top: 15px; left: 15px; cursor: pointer; font-size: 20px; z-index: 10; }
+
+/* Toast Notification */
+#toast {
+    visibility: hidden;
+    min-width: 200px; /* সাইজ কিছুটা ছোট করলাম */
+    background: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 8px 15px; /* প্যাডিং ছোট করা হয়েছে */
+    position: fixed;
+    z-index: 2000;
+    left: 50%;
+    top: 20px; /* একদম উপরে মাঝখানে */
+    transform: translateX(-50%);
+    font-size: 0.85rem; /* ফন্ট সাইজ একটু কমিয়ে সুন্দর করা হয়েছে */
+}
+
+/* Site Editor List */
+.site-list-box { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; margin: 10px 0; padding: 5px; text-align: left; }
+.site-item { display: flex; justify-content: space-between; padding: 5px; border-bottom: 1px solid #eee; font-size: 0.8rem; }
+
+
+.site-item { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  padding: 6px 0; 
+  border-bottom: 1px solid #eee; 
+}
+
+.btn-wrapper {
+  display: flex;
+  gap: 5px; /* বাটনগুলোর মাঝে সামান্য ফাঁকা জায়গা */
+}
+
+
+/* বাটনগুলোর কমন স্টাইল */
+.site-item button {
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  width: 45px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white; /* টেক্সট সাদা */
+  font-weight: 600;
+}
+
+/* Edit বাটনের রঙ সবুজ (ক্লাস ধরে) */
+.btn-edit {
+  background-color: #5bb450 !important;
+}
+
+/* Del বাটনের রঙ লাল (ক্লাস ধরে) */
+.btn-del {
+  background-color: #ef4444 !important;
+}
+
+/* সাইট এডিটরের ইনপুট ফিল্ডের গ্যাপ কমানোর জন্য */
+#editorModal .modal input {
+  margin: 5px 0; /* আগের 15px থেকে কমিয়ে 5px করা হলো */
+  padding: 8px;  /* প্যাডিংও একটু কমিয়ে দেওয়া হয়েছে */
+}
+
+/* বাটন গ্রুপের গ্যাপ কমানোর জন্য */
+#editorModal .btn-group {
+  margin: 5px 0;
+  gap: 5px; /* এটি বাটনগুলোর মধ্যের গ্যাপ নিয়ন্ত্রণ করবে */
+}
+
+
+    /* Footer: No background, black text, scrolling */
+    .footer-container { margin-top: 10px;margin-bottom: 8px; overflow: hidden; width: 100%; }
+    .scroll-text { 
+      white-space: nowrap; animation: marquee 15s linear infinite;
+      font-size: 0.9rem; font-weight: bold; color: #000; 
+    }
+    @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+/* বডি লক করার ক্লাস */
+.no-scroll {
+  overflow: hidden;
+  height: 100vh;
+}
+
+  .info-boxx {
+            background: #e3f2fd; /* অনেক হালকা নীল */
+            border: 2px solid #2196f3; /* উজ্জ্বল নীল বর্ডার */
+            padding: 5px 10px;
+            border-radius: 12px;
+            color: #0d47a1; /* গাঢ় নীল লেখা যাতে পরিষ্কার দেখা যায় */
+            font-size: 12px;
+            text-align: center;
+            max-width: 100%;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+   .button-container {
+            display: flex;
+            gap: 10px; 
+            margin-bottom: 8px;
+        }
+
+#playBtn { 
+    flex: 2; /* এটি বেশি জায়গা নেবে (লম্বা হবে) */
+    padding: 12px 10px;
+}
+
+#customBtn { 
+    flex: 1; /* এটি কম জায়গা নেবে (ছোট হবে) */
+    padding: 12px 10px;
+}
+
+        
+.btn { 
+    padding: 10px 10px;      /* প্যাডিং কমিয়ে বাটনটি সরু করা হয়েছে */
+    font-size: 14px;         /* ফন্ট সাইজ সামান্য কমানো হয়েছে */
+    color: white; 
+    text-decoration: none; 
+    border-radius: 50px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    border: none;
+    transition: 0.3s;
+    white-space: nowrap;     /* টেক্সট যাতে নিচে না নামে, এক লাইনে থাকে */
+    flex: 1;                 /* বাটনগুলো যেন সমান জায়গা নেয় */
+    display: flex;           /* টেক্সট সেন্টারে রাখার জন্য */
+    align-items: center;
+    justify-content: center;
+}
+
+        #playBtn { background: #ff0000; box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4); }
+        #customBtn { background: #2196f3; box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4); }
+
+        .btn:hover { transform: scale(1.05); }
+
+
+  </style>
+</head>
+<body>
+
+
+
+  <div class="card">
+  <!-- সেটিংস এবং টগল সুইচ এর জন্য নতুন একটি কন্টেইনার -->
+  <div class="header-row">
+    <div class="settings-icon" onclick="checkPassword()">⚙️</div>
+    
+    <label class="switch">
+      <input type="checkbox" onclick="document.body.classList.toggle('dark-mode')">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+   <h1 style="margin:0">🍿 Movie World</h1>
+  <div id="timer" style="font-size: 1.0rem; color: #ef4444; font-weight: bold; margin: 10px 0;">Session: 00:00</div>
+
+
+  <input type="text" id="movie-query" placeholder="Enter movie name..." />
+  <button class="btn-main" onclick="searchMovies()">Search All</button>
+
+  <div class="grid-container" id="site-grid"></div>
+
+  <div class="btn-group">
+    <button class="btn-close" onclick="closeAll()">Close All</button>
+    <button class="btn-exit" onclick="exitApp()">Exit</button>
+  
+
+  <button class="btn-help" onclick="openModal('aboutModal')">About</button>
+  <button class="btn-help" onclick="sendEmail()" style="background-color: #5bb450;">Contact Us (Help)</button>
+</div>
+
+    <div class="info-boxx">
+        ⚠️ Brave Browser ব্যবহার করুন স্মুথ অভিজ্ঞতার জন্য। <br>
+        না থাকলে প্লে-স্টোর থেকে ইনস্টল করুন।
+    </div>
+
+<div class="button-container">
+        <!-- Default Playlist Button -->
+        <a href="intent://music.youtube.com/playlist?list=PLJpgiXB3EoF4&autoplay=1#Intent;scheme=https;package=com.brave.browser;S.browser_fallback_url=https://music.youtube.com/playlist?list=PLJpgiXB3EoF4;end" 
+           id="playBtn" class="btn">▶︎ Play Ultimate Music</a>
+
+        <!-- Custom Playlist Button (Intent via) -->
+        <button id="customBtn" class="btn" onclick="openCustomIntent()">🔗 Link</button>
+    </div>
+
+
+  <div class="footer-container">
+    <div class="scroll-text">🌐 A.Rana Productions - Modern Movie Search Tool 🌐</div>
+  </div>
+</div>
+
+
+<input type="file" id="importFile" style="display:none" onchange="handleImport(event)">
+
+
+<div id="editorModal" class="overlay">
+  <div class="modal">
+    <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 1.1rem;">Site Editor</h3>
+    <small style="display: block; text-align: left; color: #666; font-weight: bold; margin-bottom: 2px;">
+    ID (Auto generated)
+</small>
+    <input type="number" id="site-id" placeholder="ID" readonly>
+    <input type="text" id="site-name" placeholder="Site Name">
+    <input type="text" id="site-link" placeholder="Site Link">
+    <div class="btn-group">
+      <button id="add-btn" class="btn-main" onclick="saveSite()">Add</button>
+      <button class="btn-close" onclick="resetForm()">Reset</button>
+    </div>
+    <div class="site-list-box" id="site-list-display"></div>
+    <div class="btn-group">
+      <button style="background-color: #2323ff; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer;" onclick="exportJSON()">Export</button>
+
+<button style="background-color: #2323ff; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer;" onclick="importJSON()">Import</button>
+    </div>
+    
+    <button onclick="processYoutubeLink()" style="
+    width: 100%;
+    padding: 10px; 
+    font-size: 13px; 
+    cursor: pointer; 
+    background-color: #8B4513; 
+    color: white; 
+    border: none; 
+    border-radius: 5px;
+    font-weight: bold;
+    margin-top: 8px;
+    margin-bottom: 15px;">
+    Download Youtube Video
+</button>
+
+    <button style="background-color: #ef4444; color: white; margin-top: 10px; width: 50%; padding: 8px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;" onclick="closeModal('editorModal')">Close</button>
+
+  </div>
+</div>
+<div id="toast"></div>
+
+
+<div id="aboutModal" class="overlay">
+  <div class="modal" style="line-height: 1.5; font-size: 0.85rem;">
+    <h3 style="text-align: center; margin-bottom: 15px;">About</h3>
+
+    <!-- প্রথম প্যারা -->
+    <p style="margin-bottom: 25px;">
+        <strong>Movie World</strong> একটি আধুনিক এবং স্মার্ট ওয়েব টুল, যা আপনার প্রিয় মুভি এবং কন্টেন্ট খুঁজে পাওয়ার অভিজ্ঞতাকে করেছে আরও সহজ, দ্রুত ও আনন্দদায়ক। এক ক্লিকেই আপনার পছন্দের দুনিয়ায় প্রবেশ করুন।
+    </p>
+
+    <!-- যোগাযোগ অংশ -->
+    <div style="margin-bottom: 25px;">
+        <p style="margin: 0;">কোনো প্রশ্ন বা ফিডব্যাকের জন্য যোগাযোগ করুন:</p>
+        <p style="margin: 5px 0 0 0;">📧 <strong>moviesearching@gmail.com</strong></p>
+    </div>
+
+    <!-- ধন্যবাদ অংশ -->
+    <p style="margin: 0;">আমাদের সাথে থাকার জন্য ধন্যবাদ! 🙏</p>
+    <p   </p>
+
+    <button class="btn-close" onclick="closeModal('aboutModal')">Close</button>
+  </div>
+</div>
+
+
+  <script>
+
+async function checkInitialData() {
+    try {
+        const response = await fetch('movieslist.json');
+        if (!response.ok) throw new Error("File not found");
+        movieData = await response.json();
+        
+        // সফলভাবে লোড হলে টোস্ট মেসেজ
+        showToast("Database loaded successfully!");
+    } catch (error) {
+        console.error("Data Load Error:", error);
+        showToast("Failed to load initial data!");
+    }
+}
+
+// অ্যাপ চালু হওয়ার সময় অটোমেটিক রান হবে
+window.onload = function() {
+    checkInitialData();
+};
+
+
+
+         let childWindows = [];
+         let movieData = null; // এই ভেরিয়েবলটি যোগ করুন
+
+// ১. হার্ডকোড করা সাইটগুলো
+const hardcodedSites = [
+  { name: "Google", url: "https://www.google.com/" },
+  { name: "DuckDuckGo", url: "https://duckduckgo.com/" },
+  { name: "YouTube", url: "https://www.youtube.com/" },
+  { name: "YT Music", url: "https://music.youtube.com/" },
+  { name: "MX Player", url: "https://www.mxplayer.in/" },
+  { name: "Mini Tv", url: "https://www.amazon.in/minitv" },
+  { name: "Zee5", url: "https://www.zee5.com/" },
+  { name: "Wikipedia", url: "https://bn.wikipedia.org/wiki/" }
+];
+
+// ২. হার্ডকোড করা সাইটগুলোর কার্ড তৈরি করা (সংশোধিত)
+const grid = document.getElementById('site-grid');
+hardcodedSites.forEach(s => {
+  const div = document.createElement('div');
+  div.className = 'site-card';
+  div.innerHTML = `
+    <img src="https://www.google.com/s2/favicons?domain=${s.url}" width="16" height="16" alt="">
+    ${s.name}
+  `;
+  
+  // সংশোধিত ক্লিক হ্যান্ডলার: অ্যাপ ওপেন হওয়া আটকাতে about:blank ব্যবহার করা হয়েছে
+  div.onclick = () => {
+    const win = window.open('about:blank', '_blank');
+    if (win) {
+      win.location.href = s.url; // এখানে লিঙ্ক লোড হলে অ্যান্ড্রয়েড অ্যাপ ইনটেন্ট ট্রিগার করতে পারে না
+      childWindows.push(win);
+    }
+  };
+  grid.appendChild(div);
+});
+
+// ৩. JSON ব্যবহার করে সবগুলোতে একসাথে সার্চ করা
+async function searchMovies() {
+    const query = document.getElementById('movie-query').value.trim();
+    if (!query) { alert('অনুগ্রহ করে একটি মুভির নাম লিখুন!'); return; }
+
+    try {
+        // [নতুন চেক]: যদি movieData ফাঁকা থাকে, তবেই সার্ভার থেকে ফেচ হবে
+        if (movieData === null) {
+            const response = await fetch('movieslist.json');
+            if (!response.ok) throw new Error("File not found");
+            movieData = await response.json();
+        }
+        
+        // এখন movieData-এর ভেতর ডাটা আছে, সেটি ব্যবহার করুন
+        const siteList = movieData.sites; 
+
+        if(confirm(`${siteList.length} টি সাইটে সার্চ শুরু করতে চান?`)) {
+            const encodedQuery = encodeURIComponent(query);
+            const reversedSiteList = [...siteList].reverse();
+
+            reversedSiteList.forEach((site, index) => {
+                const targetUrl = site.site_link.replace("[movie]", encodedQuery);
+                setTimeout(() => {
+                    const win = window.open(targetUrl, '_blank');
+                    if (win) childWindows.push(win);
+                }, index * 200); 
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        alert("দুঃখিত, ফাইলটি লোড করা যায়নি!");
+    }
+}
+
+     // Timer Script
+  let seconds = 0;
+  setInterval(() => {
+    seconds++;
+    let mins = Math.floor(seconds / 60);
+    let secs = seconds % 60;
+    document.getElementById('timer').innerText = `Session: ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }, 1000);
+
+    function showHelpSupport() {
+  const message = `Movie World একটি আধুনিক ওয়েব টুল, যা আপনার প্রিয় মুভি এবং কন্টেন্ট খুঁজে পাওয়ার প্রক্রিয়াকে করেছে আরও সহজ ও দ্রুত।
+
+কোনো প্রয়োজনে সরাসরি যোগাযোগ করুন:
+📧 moviesearching@gmail.com`;
+
+  alert(message);
+}
+    
+    function sendEmail() {
+            // আপনার ইমেইল ঠিকানা এখানে বসান
+            var email = "dadamanchu804@gmail.com"; 
+            var subject = "Movie Search App - Suggestion";
+            var body = "আপনার পরামর্শ এখানে লিখুন...";
+            
+            // mailto লিঙ্ক তৈরি
+            var mailtoLink = "mailto:" + email + 
+                             "?subject=" + encodeURIComponent(subject) + 
+                             "&body=" + encodeURIComponent(body);
+            
+            // লিঙ্ক ওপেন করা
+            window.location.href = mailtoLink;
+        }
+
+
+// পাসওয়ার্ড চেক
+function checkPassword() {
+    let pass = prompt("Enter Developer Password:");
+    if (pass === "Dev321") {
+        openModal('editorModal');
+        document.getElementById('site-id').readOnly = true; // এখানেও readonly সেট করা হলো
+        renderSiteList();
+        generateNewId();
+    } else {
+        alert("Incorrect Password!");
+    }
+}
+
+
+// Toast মেসেজ
+function showToast(msg) {
+    let t = document.getElementById('toast');
+    t.innerText = msg;
+    t.style.visibility = 'visible';
+    setTimeout(() => { t.style.visibility = 'hidden'; }, 2000);
+}
+
+// নতুন আইডি জেনারেট
+function generateNewId() {
+    let maxId = movieData.sites.reduce((max, s) => Math.max(max, s.id), 0);
+    document.getElementById('site-id').value = maxId + 1;
+}
+
+
+
+// সেভ বা আপডেট
+function saveSite() {
+    let idInput = document.getElementById('site-id');
+    let id = parseInt(idInput.value);
+    let name = document.getElementById('site-name').value.trim();
+    let link = document.getElementById('site-link').value.trim();
+    
+    // ১. ন্যাচারাল নাম্বার চেক
+    if (isNaN(id) || id <= 0) {
+        showToast("Please enter a valid natural number ID!");
+        return;
+    }
+
+    // ২. চেক করা হচ্ছে এটা 'Update' নাকি 'Add' মোড
+    let isEditing = (document.getElementById('add-btn').innerText === "Update");
+
+    if (isEditing) {
+        // এডিট মোড: আইডি পরিবর্তন করা হয়েছে কি না চেক করা
+        let originalId = parseInt(idInput.getAttribute('data-original-id'));
+        
+        // যদি আইডি পরিবর্তন করা হয়, তবেই চেক করতে হবে নতুন আইডিটি অলরেডি আছে কি না
+        if (id !== originalId) {
+            let duplicate = movieData.sites.find(s => s.id === id);
+            if (duplicate) {
+                showToast("ID already exists! Please choose another ID.");
+                return;
+            }
+        }
+        
+        // আপডেট করা
+        let index = movieData.sites.findIndex(s => s.id === originalId);
+        movieData.sites[index] = {id, site_name: name, site_link: link};
+        showToast("Updated Successfully!");
+    } else {
+        // নতুন এন্ট্রি মোড (এখানে চেক করার দরকার নেই, কারণ maxId+1 ইউনিক)
+        movieData.sites.push({id, site_name: name, site_link: link});
+        showToast("Added Successfully!");
+    }
+
+    updateMetadata();
+    resetForm();
+    renderSiteList();
+}
+
+
+
+// মেটাডাটা ভার্সন আপডেট
+function updateMetadata() {
+    let v = movieData.metadata.version.split('.').map(Number);
+    v[2] += 1; // 1.0.6 -> 1.0.7
+    movieData.metadata.version = v.join('.');
+    movieData.metadata.updated_at = new Date().toLocaleDateString('en-GB');
+}
+
+// লিস্ট প্রদর্শন
+function renderSiteList() {
+    let list = document.getElementById('site-list-display');
+    list.innerHTML = '';
+    movieData.sites.forEach(s => {
+        list.innerHTML += `
+        <div class="site-item">
+            <span style="font-size: 0.8rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 150px;">
+                ${s.id} - ${s.site_name}
+            </span>
+            <div class="btn-wrapper">
+                <!-- এখানে ক্লাসগুলো যোগ করা হলো -->
+                <button class="btn-edit" onclick="editSite(${s.id})">Edit</button>
+                <button class="btn-del" onclick="deleteSite(${s.id})">Del</button>
+            </div>
+        </div>`;
+    });
+}
+
+
+function editSite(id) {
+    let site = movieData.sites.find(s => s.id === id);
+    if(site) {
+        let idInput = document.getElementById('site-id');
+        idInput.value = site.id;
+        idInput.setAttribute('data-original-id', site.id); // পুরনো আইডিটি ধরে রাখা
+        idInput.readOnly = false; // এডিট মোডে এডিটযোগ্য করা
+        document.getElementById('site-name').value = site.site_name;
+        document.getElementById('site-link').value = site.site_link;
+        document.getElementById('add-btn').innerText = "Update";
+    }
+}
+
+
+
+function deleteSite(id) {
+    if(confirm("Delete this site?")) {
+        movieData.sites = movieData.sites.filter(s => s.id !== id);
+        renderSiteList();
+        showToast("Deleted!");
+    }
+}
+
+// এক্সপোর্ট ফাইল
+function exportJSON() {
+    const now = new Date();
+    const ts = `${("0"+now.getDate()).slice(-2)}${("0"+(now.getMonth()+1)).slice(-2)}${now.getFullYear()}_${now.getHours()}${now.getMinutes()}${now.getSeconds()}`;
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(movieData, null, 2));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", `movieslist_${ts}.json`);
+    dlAnchorElem.click();
+    showToast("Exported!");
+}
+
+function importJSON() {
+    document.getElementById('importFile').click();
+}
+
+function handleImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            movieData = importedData; // সরাসরি মেমোরি আপডেট
+            renderSiteList();
+            showToast("Imported successfully!");
+        } catch (err) {
+            showToast("Invalid JSON file!");
+        }
+    };
+    reader.readAsText(file);
+}
+
+function resetForm() {
+    let idInput = document.getElementById('site-id');
+    idInput.value = '';
+    idInput.readOnly = true; // আবার readonly করে দেওয়া হলো
+    document.getElementById('site-name').value = '';
+    document.getElementById('site-link').value = '';
+    document.getElementById('add-btn').innerText = "Add";
+    generateNewId(); // নতুন আইডি জেনারেট হবে
+}
+
+// পপআপ ওপেন করার সময় বডি লক করা
+function openModal(id) { 
+    document.getElementById(id).style.display = 'flex'; 
+    document.body.classList.add('no-scroll'); // এই লাইনটি যোগ করুন
+}
+
+// পপআপ বন্ধ করার সময় বডি আনলক করা
+function closeModal(id) { 
+    if (id === 'editorModal') {
+        const confirmSave = confirm("আপনি কি ডাটা 'Export' করে নিয়েছেন? এটি টেম্পোরারি মেমোরি, পপআপ বন্ধ করলে ডাটা হারিয়ে যেতে পারে।");
+        if (!confirmSave) {
+            return; 
+        }
+    }
+    
+    document.getElementById(id).style.display = 'none'; 
+    document.body.classList.remove('no-scroll'); // এই লাইনটি যোগ করুন
+}
+
+     function processYoutubeLink() {
+    // প্রম্পট বক্স থেকে ইউআরএল নেওয়া
+    let url = prompt("Enter Your Youtube Link:");
+
+    // ইউজার ক্যান্সেল করলে বা খালি রাখলে ফাংশন থেকে বের হয়ে যাওয়া
+    if (!url) return;
+
+    // ভিডিও আইডি এক্সট্র্যাক্ট করা
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    const videoID = (match && match[2].length === 11) ? match[2] : null;
+
+    if (videoID) {
+        const sites = [
+            `https://v24.www-y2mate.com/en/convert-video/${videoID}`,
+            `https://www.yout.com/watch?v=${videoID}`,
+            `https://www.youtubepi.com/watch?v=${videoID}`,
+            `https://www.youpak.com/watch?v=${videoID}`,
+            `https://ssyoutube.com/watch?v=${videoID}`
+        ];
+
+        // প্রতিটি সাইট ওপেন করা এবং অ্যারেতে রেফারেন্স রাখা
+        sites.forEach(site => {
+            const win = window.open(site, '_blank');
+            if (win) {
+                childWindows.push(win); // এখানে ট্যাবগুলো অ্যারেতে সেভ হচ্ছে
+            }
+        });
+        
+        showToast("YouTube downloader sites opened!");
+    } else {
+        alert("Invalid YouTube Link. Please try again.");
+    }
+}
+
+    function closeAll() {
+    // ১. আপনার নিজের ট্র্যাকিং করা উইন্ডোগুলো বন্ধ করার চেষ্টা
+    childWindows.forEach((win) => {
+        if (win && !win.closed) {
+            try {
+                win.close(); 
+            } catch (e) {
+                console.log("উইন্ডোটি ক্লোজ করা সম্ভব হয়নি (নিরাপত্তা সীমাবদ্ধতা):", e);
+            }
+        }
+    });
+
+    // ২. ট্র্যাকিং অ্যারে পরিষ্কার করা
+    childWindows = [];
+    showToast("সব ট্যাব বন্ধ করার চেষ্টা করা হয়েছে!");
+}
+
+function openCustomIntent() {
+            let userLink = prompt("আপনার YouTube প্লেলিস্ট লিংকটি দিন:");
+            
+            if (userLink && userLink.trim() !== "") {
+                // লিংক থেকে https:// অংশটি সরিয়ে শুধু মূল অংশটি নেওয়া
+                let cleanUrl = userLink.replace(/^https?:\/\//, '');
+                
+                // Intent URL তৈরি করা
+                let intentUrl = "intent://" + cleanUrl + (cleanUrl.includes("?") ? "&" : "?") + "autoplay=1#Intent;scheme=https;package=com.brave.browser;S.browser_fallback_url=" + encodeURIComponent(userLink) + ";end";
+                
+                // Intent ট্রিগার করা
+                window.location.href = intentUrl;
+            } else {
+                alert("দয়া করে একটি সঠিক লিংক দিন।");
+            }
+        }
+        
+    function exitApp() {
+    // ১. প্রথমে সব খোলা ট্যাবগুলো বন্ধ করবে
+    closeAll();
+    
+    // ২. এবার বর্তমান ট্যাবটি বন্ধ করার কমান্ড দেবে
+    // ব্রাউজারের নিরাপত্তার কারণে এটি শুধুমাত্র তখনই কাজ করবে যদি ট্যাবটি script দ্বারা ওপেন করা হয়
+    window.close();
+    
+    // যদি ব্রাউজার ট্যাব বন্ধ করতে না দেয় (নিরাপত্তার কারণে), তবে ইউজারকে একটি বার্তা দেখাবে
+    setTimeout(() => {
+        alert("আপনি এখন ট্যাবটি ম্যানুয়ালি বন্ধ করতে পারেন।");
+    }, 500);
+}
+
+  </script>
+</body>
+</html>
