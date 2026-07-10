@@ -433,12 +433,12 @@ window.onload = function() {
 // ১. হার্ডকোড করা সাইটগুলো
 const hardcodedSites = [
   { name: "Google", url: "https://www.google.com/" },
-  { name: "DuckDuckGo", url: "https://duckduckgo.com/" },
+  { name: "AI Search", url: "https://www.google.com/search?udm=50"},// udm=14 use korte paro
   { name: "YouTube", url: "https://www.youtube.com/" },
   { name: "YT Music", url: "https://music.youtube.com/" },
-  { name: "MX Player", url: "https://www.mxplayer.in/" },
-  { name: "Mini Tv", url: "https://www.amazon.in/minitv" },
+  { name: "Mini TV", url: "https://www.amazon.in/minitv" },
   { name: "Zee5", url: "https://www.zee5.com/" },
+  { name: "DuckDuckGo", url: "https://duckduckgo.com/" },
   { name: "Wikipedia", url: "https://bn.wikipedia.org/wiki/" }
 ];
 
@@ -789,6 +789,8 @@ function openCustomIntent() {
                 alert("দয়া করে একটি সঠিক লিংক দিন।");
             }
         }
+
+
         
     function exitApp() {
     // ১. প্রথমে সব খোলা ট্যাবগুলো বন্ধ করবে
