@@ -535,30 +535,44 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 
   <script>
+  
+  let childWindows = [];
+  let movieData = null;
+  let favData = null; // favData সংরক্ষণের জন্য ভেরিয়েবল
 
-async function checkInitialData() {
+async function initializeApp() {
+    showToast("Loading resources, please wait...");
+    
     try {
-        const response = await fetch('movieslist.json');
-        if (!response.ok) throw new Error("File not found");
-        movieData = await response.json();
+        // দুটি ফাইল একসাথে লোড করা
+        const [movieRes, favRes] = await Promise.all([
+            fetch('movieslist.json'),
+            fetch('favouritesitelist.json')
+        ]);
+
+        if (!movieRes.ok || !favRes.ok) throw new Error("Files not found");
+
+        movieData = await movieRes.json();
+        favData = await favRes.json();
+
+        // লোড সফল হলে বাটনগুলো সচল করা
+        document.getElementById('searchBtn').disabled = false;
         
-        // সফলভাবে লোড হলে টোস্ট মেসেজ
+        // ফেভারিট আইকনটি সচল করা
+        const favIcon = document.getElementById('favIcon');
+        favIcon.style.pointerEvents = 'auto';
+        favIcon.style.opacity = '1';
+
         showToast("Database loaded successfully!");
     } catch (error) {
-        console.error("Data Load Error:", error);
-        showToast("Failed to load initial data!");
+        console.error("Initialization Error:", error);
+        showToast("Failed to load data! Please reload.");
     }
 }
 
-// অ্যাপ চালু হওয়ার সময় অটোমেটিক রান হবে
-window.onload = function() {
-    checkInitialData();
-};
+// পেজ লোড হলে অ্যাপ ইনিশিয়ালাইজ হবে
+window.onload = initializeApp;
 
-
-
-         let childWindows = [];
-         let movieData = null; // এই ভেরিয়েবলটি যোগ করুন
 
 // ১. হার্ডকোড করা সাইটগুলো
 const hardcodedSites = [
@@ -966,31 +980,17 @@ function openSelectedAI() {
     }
 }
 
-
 function checkFavouritePassword() {
     let pass = prompt("Enter Password:");
     if (pass === "321") {
-        openModal('favouriteModal'); // মডাল ওপেন হবে
-        loadFavourites();          // JSON ফাইল থেকে ডাটা লোড হবে
+        openModal('favouriteModal');
+        // আলাদা করে ফেচ করার দরকার নেই, যেহেতু favData অলরেডি লোড করা আছে
+        renderFavourites(favData); 
     } else {
         alert("Incorrect Password!");
     }
 }
 
-
-async function loadFavourites() {
-    try {
-        const response = await fetch('favouritesitelist.json'); // এখানে ফাইলের নাম পরিবর্তন করুন
-        if (!response.ok) throw new Error("File not found");
-        const favData = await response.json();
-        
-        // ডেটা লোড হওয়ার পর রেন্ডার ফাংশন কল করুন
-        renderFavourites(favData); 
-    } catch (error) {
-        console.error("Favourites Load Error:", error);
-        showToast("Failed to load favourites!");
-    }
-}
 
 
 function renderFavourites(favData) {
