@@ -1,21 +1,44 @@
+
 {
-  "categories": [
-    {
-      "name": "Banking",
-      "sites": [
-        {"name": "SBI", "url": "https://onlinesbi.sbi"},
-        {"name": "Axis", "url": "https://axisbank.com"},
-        {"name": "ICICI", "url": "https://icicibank.com"},
-        {"name": "Local Bank", "url": "https://localbank.com", "icon": "my-local-icon.png"}
-      ]
-    },
-    {
-      "name": "Office & Work",
-      "sites": [
-        {"name": "Google Docs", "url": "https://docs.google.com"},
-        {"name": "Google Sheets", "url": "https://sheets.google.com"},
-        {"name": "EditPad", "url": "https://editpad.org"}
-      ]
-    }
-  ]
+  "categories": [
+    {
+      "name": "Banking",
+      "sites": [
+        {
+          "name": "SBI",
+          "url": "https://onlinesbi.sbi"
+        },
+        {
+          "name": "Axis",
+          "url": "https://axisbank.com"
+        },
+        {
+          "name": "ICICI",
+          "url": "https://icicibank.com"
+        },
+        {
+          "name": "Local Bank",
+          "url": "https://localbank.com",
+          "icon": "my-local-icon.png"
+        }
+      ]
+    },
+    {
+      "name": "Office & Work",
+      "sites": [
+        {
+          "name": "Google Docs",
+          "url": "https://docs.google.com"
+        },
+        {
+          "name": "Google Sheets",
+          "url": "https://sheets.google.com"
+        },
+        {
+          "name": "EditPad",
+          "url": "https://editpad.org"
+        }
+      ]
+    }
+  ]
 }
