@@ -1,25 +1,30 @@
-
 {
+  "version": "1.0.0",
+  "last_updated": "2026-07-15",
+  "total_sites": 7,
   "categories": [
     {
       "name": "Banking",
       "sites": [
         {
           "name": "SBI",
-          "url": "https://onlinesbi.sbi"
+          "url": "https://onlinesbi.sbi",
+          "icon": ""
         },
         {
           "name": "Axis",
-          "url": "https://axisbank.com"
+          "url": "https://axisbank.com",
+          "icon": ""
         },
         {
           "name": "ICICI",
-          "url": "https://icicibank.com"
+          "url": "https://icicibank.com",
+          "icon": ""
         },
         {
           "name": "Local Bank",
           "url": "https://localbank.com",
-          "icon": "my-local-icon.png"
+          "icon": "https://png.pngtree.com/png-clipart/20190614/original/pngtree-bank-icon-png-image_3700425.jpg"
         }
       ]
     },
@@ -28,15 +33,18 @@
       "sites": [
         {
           "name": "Google Docs",
-          "url": "https://docs.google.com"
+          "url": "https://docs.google.com",
+          "icon": ""
         },
         {
           "name": "Google Sheets",
-          "url": "https://sheets.google.com"
+          "url": "https://sheets.google.com",
+          "icon": ""
         },
         {
           "name": "EditPad",
-          "url": "https://editpad.org"
+          "url": "https://editpad.org",
+          "icon": ""
         }
       ]
     }

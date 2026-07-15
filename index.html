@@ -40,7 +40,7 @@
     
     /* Search Input */
     input {
-      width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #ddd;
+      width: 100%; padding: 12px; margin: 15px 0 5px 0; border: 2px solid #ddd;
       border-radius: 8px; box-sizing: border-box; font-size: 1rem;
     }
 
@@ -328,7 +328,76 @@ input:checked + .slider:before { transform: translateX(20px); }
     text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; 
 }
 
+  .button-row {
+  display: flex;
+  gap: 10px;           /* দুই বাটনের মাঝে ১০পিক্সেল ফাঁকা */
+  width: 100%;
+  margin: 5px 0 15px 0;    /* ওপর-নিচে ১৫পিক্সেল জায়গা */
+}
 
+.button-row button {
+  flex: 1;             /* দুই বাটন সমান চওড়া হবে */
+  margin: 0;           /* আগে দেওয়া মার্জিনগুলো রিসেট করা হলো */
+  padding: 12px;       /* বাটনগুলো সুন্দর দেখানোর জন্য প্যাডিং */
+}
+
+  
+  
+  /* মডালের ভেতরের ক্লোজ বাটনকে উপরে ডান দিকে নেওয়ার জন্য */
+.modal-close-top {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: transparent !important;
+  color: white !important;
+  border: none !important;
+  font-size: 24px !important;
+  cursor: pointer;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: auto !important;
+}
+
+/* মডালটি যেন রিলেটিভ পজিশনে থাকে */
+#favouriteModal .modal {
+  position: relative;
+  background: #001f3f;
+  color: white;
+  padding: 20px;
+  border-radius: 20px;
+  width: 95%;
+  max-width: 500px;
+  box-sizing: border-box;
+}
+
+/* ক্যাটাগরি শিরোনামের স্টাইল */
+.category-title {
+  color: #06b6d4; /* উজ্জ্বল নীল টেক্সট */
+  font-weight: bold;
+  font-size: 1rem;
+  border-left: 4px solid #06b6d4;
+  padding-left: 10 !important; /* বাড়তি জায়গা মুছে দেওয়া */
+  border-bottom: none !important;
+  /* border-left: 4px solid #06b6d4; <-- এই লাইনটি সরিয়ে দিন */
+  /* padding-left: 10px; <-- এই লাইনটিও সরিয়ে দিন */
+  margin: 5px 0 10px 0;
+  text-align: left;
+}
+
+/* ফেভারিট কার্ডের স্টাইল */
+.fav-card { 
+  background: #003366; /* বাটনগুলোর জন্য কিছুটা হালকা নীল */
+  padding: 10px; 
+  border-radius: 12px; 
+  text-align: center; 
+  color: white;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+}
+
+.fav-card:hover {
+  background: #004080;
+}
 
   </style>
 </head>
@@ -364,8 +433,9 @@ input:checked + .slider:before { transform: translateX(20px); }
 
   <input type="text" id="movie-query" placeholder="Enter movie name..." />
 
+  <div class="button-row">
   <button id="searchBtn" class="btn-main" onclick="searchMovies()">Search All</button>
-  <button class="btn-close" onclick="closeAll()">Close All</button>
+  <button class="btn-exit" onclick="closeAll()">Close All</button>
   </div>
 
   <div class="grid-container" id="site-grid"></div>
@@ -990,40 +1060,89 @@ function checkFavouritePassword() {
         alert("Incorrect Password!");
     }
 }
+}
 
+  function renderFavourites(favData) {
+    const modal = document.querySelector('#favouriteModal .modal');
+    // মডালের ভেতর যা আছে তা পরিষ্কার করা
+    modal.innerHTML = '';
 
-function renderFavourites(favData) {
-    const container = document.getElementById('fav-content-area');
-    container.innerHTML = ''; // পুরনো কন্টেন্ট পরিষ্কার করা
+    // ১. উপরে ডান কোণায় ক্লোজ বাটন
+    let closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '&times;';
+    closeBtn.className = 'modal-close-top';
+    closeBtn.onclick = () => closeModal('favouriteModal');
+    modal.appendChild(closeBtn);
 
-    if (!favData || !favData.categories) {
-        console.error("Invalid JSON format");
-        return;
-    }
+    // ২. শিরোনাম এবং ডিভাইডার
+    let title = document.createElement('h3');
+    title.innerText = 'My Favourites';
+    title.style.textAlign = 'left';
+    title.style.marginTop = '0';
+    title.style.marginBottom = '25px';
+    title.style.paddingBottom = '10px';
+    title.style.borderBottom = '1px solid #06b6d4';
+    modal.appendChild(title);
+
+    // ৩. কন্টেইনার
+    let container = document.createElement('div');
+    container.className = 'fav-container';
+    container.id = 'fav-content-area';
+    modal.appendChild(container);
+
+    // ৪. ডাটা রেন্ডার করা
+    if (!favData || !favData.categories) return;
 
     favData.categories.forEach(cat => {
-        let section = document.createElement('div');
-        section.className = 'category-section';
-        section.innerHTML = `<div class="category-title">${cat.name}</div><div class="grid-fav"></div>`;
-        
-        const grid = section.querySelector('.grid-fav');
-        
+        let catTitle = document.createElement('div');
+        catTitle.className = 'category-title';
+        catTitle.innerText = cat.name;
+        container.appendChild(catTitle);
+
+        let grid = document.createElement('div');
+        grid.className = 'grid-fav';
+        grid.style.display = 'grid';
+        grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        grid.style.gap = '10px';
+        grid.style.marginBottom = '10px'; // ক্যাটাগরির মাঝে স্পেস
+
         cat.sites.forEach(site => {
-            let iconSrc = site.icon ? site.icon : `https://www.google.com/s2/favicons?domain=${site.url}&sz=64`;
+            // আইকন লজিক: যদি icon খালি string হয়, তবে গুগল ফেভিকন ব্যবহার হবে
+            let iconSrc = (site.icon && site.icon !== "") 
+                          ? site.icon 
+                          : `https://www.google.com/s2/favicons?domain=${site.url}&sz=64`;
             
             let item = document.createElement('div');
             item.className = 'fav-card';
             item.innerHTML = `
-                <img src="${iconSrc}" width="24" height="24" style="border-radius:4px;">
-                <div style="font-size: 10px; margin-top: 4px;">${site.name}</div>
+                <img src="${iconSrc}" width="24" height="24" style="border-radius:4px; display:block; margin: 0 auto;">
+                <div style="font-size: 10px; margin-top: 5px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${site.name}</div>
             `;
             item.onclick = () => window.open(site.url, '_blank');
             grid.appendChild(item);
         });
-        
-        container.appendChild(section);
+        container.appendChild(grid);
     });
+
+    // ৫. প্রফেশনাল ফুটার ইনফরমেশন
+    let footer = document.createElement('div');
+    footer.style.marginTop = '20px';
+    footer.style.paddingTop = '10px';
+    footer.style.borderTop = '1px solid #003366';
+    footer.style.fontSize = '10px';
+    footer.style.color = '#888';
+    footer.style.textAlign = 'center';
+    footer.style.display = 'flex';
+    footer.style.justifyContent = 'space-around';
+
+    footer.innerHTML = `
+        <span>Version: ${favData.version || '1.0.0'}</span>
+        <span>Updated: ${favData.last_updated || 'N/A'}</span>
+        <span>Total Sites: ${favData.total_sites || 0}</span>
+    `;
+    modal.appendChild(footer);
 }
+
 
       </script>
 </body>
