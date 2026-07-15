@@ -343,7 +343,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 <!-- নতুন AI Icon বাটন -->
 <div class="ai-icon" onclick="checkAIPassword()" style="position: absolute; top: 54px; left: 15px; cursor: pointer; font-size: 20px; z-index: 10;">🤖</div>
     <!-- নতুন Favourite Site বাটন -->
-<div class="ai-icon" onclick="checkFavouritePassword()" style="position: absolute; top: 90px; left: 15px; cursor: pointer; font-size: 20px; z-index: 10;">✮</div>
+<div class="ai-icon" id="favIcon" onclick="checkFavouritePassword()" style="position: absolute; top: 90px; left: 15px; cursor: pointer; font-size: 20px; z-index: 10;">✮</div>
     
 
     <label class="switch">
@@ -564,10 +564,11 @@ async function initializeApp() {
         favIcon.style.opacity = '1';
 
         showToast("Database loaded successfully!");
-    } catch (error) {
-        console.error("Initialization Error:", error);
-        showToast("Failed to load data! Please reload.");
-    }
+      } catch (error) {
+    console.error("Initialization Error:", error);
+    // টোস্টের বদলে সরাসরি এররটি দেখান
+    alert("Error: " + error.message); 
+  }
 }
 
 // পেজ লোড হলে অ্যাপ ইনিশিয়ালাইজ হবে
@@ -992,22 +993,23 @@ function checkFavouritePassword() {
 }
 
 
-
 function renderFavourites(favData) {
     const container = document.getElementById('fav-content-area');
     container.innerHTML = ''; // পুরনো কন্টেন্ট পরিষ্কার করা
 
+    if (!favData || !favData.categories) {
+        console.error("Invalid JSON format");
+        return;
+    }
+
     favData.categories.forEach(cat => {
-        // ক্যাটাগরি সেকশন তৈরি
         let section = document.createElement('div');
         section.className = 'category-section';
         section.innerHTML = `<div class="category-title">${cat.name}</div><div class="grid-fav"></div>`;
         
         const grid = section.querySelector('.grid-fav');
         
-        // সাইটগুলো লুপ করা
         cat.sites.forEach(site => {
-            // আইকন লজিক: যদি icon ফিল্ড না থাকে, তবে গুগল অটোমেটিক ফেভিকন ব্যবহার করবে
             let iconSrc = site.icon ? site.icon : `https://www.google.com/s2/favicons?domain=${site.url}&sz=64`;
             
             let item = document.createElement('div');
@@ -1023,8 +1025,6 @@ function renderFavourites(favData) {
         container.appendChild(section);
     });
 }
-
-
 
       </script>
 </body>
