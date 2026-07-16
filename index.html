@@ -653,7 +653,6 @@ button { padding: 10px; border: none; border-radius: 6px; background: var(--prim
     <div class="favbtn-container">
         <button onclick="document.getElementById('fileInput').click()">Import</button>
         <button onclick="exportData()" style="background:#10b981">Export</button>
-        <button onclick="clearData()" style="background:var(--danger)">Clear</button>
     </div>
     <input type="file" id="fileInput" style="display:none" onchange="importData(event)">
 </div>
@@ -739,7 +738,6 @@ async function initializeApp() {
     showToast("Loading resources, please wait...");
     
     try {
-        // দুটি ফাইল একসাথে লোড করা
         const [movieRes, favRes] = await Promise.all([
             fetch('movieslist.json'),
             fetch('favouritesitelist.json')
@@ -750,21 +748,21 @@ async function initializeApp() {
         movieData = await movieRes.json();
         favData = await favRes.json();
 
-        // লোড সফল হলে বাটনগুলো সচল করা
         document.getElementById('searchBtn').disabled = false;
-        
-        // ফেভারিট আইকনটি সচল করা
         const favIcon = document.getElementById('favIcon');
         favIcon.style.pointerEvents = 'auto';
         favIcon.style.opacity = '1';
 
+        // ডাটা লোড হওয়ার পর ড্রপডাউন সেটআপ করুন
+        setupDropdowns(); 
+
         showToast("Database loaded successfully!");
-      } catch (error) {
-    console.error("Initialization Error:", error);
-    // টোস্টের বদলে সরাসরি এররটি দেখান
-    alert("Error: " + error.message); 
-  }
+    } catch (error) {
+        console.error("Initialization Error:", error);
+        alert("Error: " + error.message); 
+    }
 }
+
 
 // পেজ লোড হলে অ্যাপ ইনিশিয়ালাইজ হবে
 window.onload = initializeApp;
@@ -1348,28 +1346,35 @@ function checkFavEditorPassword() {
     }
 
     function delCategory() {
-        const id = document.getElementById('catSelect').value;
-        if(!id) return;
-        if(confirm("Delete this category and all its sites?")) {
-            favData.categories = favData.categories.filter(c => c.id != id);
-            renderSites();
-            // ড্রপডাউন থেকে অপশন রিমুভ
-            const select = document.getElementById('catSelect');
-            select.remove(select.selectedIndex);
-        }
+    const select = document.getElementById('catSelect');
+    const id = select.value;
+    if(!id) return;
+    
+    if(confirm("Delete this category and all its sites?")) {
+        favData.categories = favData.categories.filter(c => c.id != id);
+        renderSites();
+        select.remove(select.selectedIndex);
+        showToast("Category Deleted!"); // টোস্ট নোটিশ
     }
+}
 
   
 // ১. রেন্ডার ফাংশন (আপডেট করা ক্লাসসহ)
 function renderSites() {
-    const cat = favData.categories.find(c => c.id == document.getElementById('catSelect').value);
+    const select = document.getElementById('catSelect');
     const list = document.getElementById('siteList');
-    list.innerHTML = '';
+    list.innerHTML = ''; // লিস্ট পরিষ্কার করা
 
-    if (!cat) return;
+    if (!favData || !favData.categories) return;
 
-    cat.sites.sort((a, b) => a.id - b.id);
-    cat.sites.forEach((s, i) => {
+    const selectedCat = favData.categories.find(c => c.id == select.value);
+    
+    if (!selectedCat) {
+        list.innerHTML = "No sites in this category.";
+        return;
+    }
+
+    selectedCat.sites.forEach((s, i) => {
         list.innerHTML += `
         <div class="favsite-item">
             <span>${s.id} - ${s.name}</span> 
@@ -1380,6 +1385,19 @@ function renderSites() {
         </div>`;
     });
 }
+
+
+  // initializeApp ফাংশনের শেষে এটি যোগ করুন
+function setupDropdowns() {
+    const select = document.getElementById('catSelect');
+    select.innerHTML = ''; // পরিষ্কার করা
+    favData.categories.forEach(c => {
+        select.innerHTML += `<option value="${c.id}">${c.id} - ${c.name}</option>`;
+    });
+    // ডিফল্ট প্রথম ক্যাটাগরি রেন্ডার
+    if(favData.categories.length > 0) renderSites();
+}
+
 
 // ২. এক্সপোর্ট ফাংশন
 function exportData() {
@@ -1402,11 +1420,31 @@ function exportData() {
 function importData(e) {
     const reader = new FileReader();
     reader.onload = (event) => {
-        favData = JSON.parse(event.target.result);
-        renderSites();
-        alert("Data imported to RAM!");
+        try {
+            favData = JSON.parse(event.target.result);
+            
+            const select = document.getElementById('catSelect');
+            select.innerHTML = ''; 
+            
+            // অপশনগুলো যোগ করা
+            favData.categories.forEach(c => { 
+                select.innerHTML += `<option value="${c.id}">${c.id} - ${c.name}</option>`; 
+            });
+            
+            // ডাটা ইমপোর্ট হওয়ার পর প্রথম ক্যাটাগরি সিলেক্ট করা এবং রেন্ডার করা
+            if(favData.categories.length > 0) {
+                select.value = favData.categories[0].id;
+                renderSites(); 
+            }
+            
+            alert("Data imported successfully!");
+        } catch (err) {
+            alert("Error reading file!");
+        }
     };
     reader.readAsText(e.target.files[0]);
+  // ইমপোর্ট ফাংশনের শেষে এটি যোগ করুন
+document.getElementById('catSelect').dispatchEvent(new Event('change'));
 }
 
 // ৪. সাইট সেভ/আপডেট ফাংশন
@@ -1416,6 +1454,19 @@ function saveSite() {
     
     const newId = parseInt(document.getElementById('favSiteID').value);
     const editIdx = document.getElementById('editIndex').value;
+    
+    // চেক: আইডি ফাঁকা কি না
+    if (isNaN(newId)) {
+        alert("Please enter a valid ID!");
+        return;
+    }
+
+    // ইউনিক আইডি চেক: ক্যাটাগরির অন্য সাইটগুলোর সাথে আইডি মিলছে কি না দেখা
+    const duplicate = cat.sites.find((s, index) => s.id == newId && index != editIdx);
+    if (duplicate) {
+        alert("Error: This ID already exists in this category! Please use a unique ID.");
+        return;
+    }
     
     const siteData = { 
         id: newId, 
@@ -1430,8 +1481,10 @@ function saveSite() {
         cat.sites.push(siteData); 
     }
     
+    showToast(editIdx !== "" ? "Site Updated!" : "Site Added!");
     renderSites(); 
     resetForm();
+    alert("Site saved successfully!");
 }
 
 // ৫. সাইট ডিলিট ফাংশন
@@ -1440,6 +1493,7 @@ function delSite(idx) {
         const cat = favData.categories.find(c => c.id == document.getElementById('catSelect').value);
         cat.sites.splice(idx, 1);
         renderSites();
+        showToast("Site Deleted!");
     }
 }
 
@@ -1449,8 +1503,27 @@ function resetForm() {
     document.getElementById('favSiteName').value = "";
     document.getElementById('favSiteUrl').value = "";
     document.getElementById('favIconUrl').value = "";
+    document.getElementById('favSiteID').value = getNextId();
 }
 
+  function loadEdit(idx) {
+    const cat = favData.categories.find(c => c.id == document.getElementById('catSelect').value);
+    const site = cat.sites[idx];
+    document.getElementById('editIndex').value = idx;
+    document.getElementById('favSiteID').value = site.id;
+    document.getElementById('favSiteName').value = site.name;
+    document.getElementById('favSiteUrl').value = site.url;
+    document.getElementById('favIconUrl').value = site.icon;
+}
+  
+  function getNextId() {
+    const cat = favData.categories.find(c => c.id == document.getElementById('catSelect').value);
+    if (!cat || cat.sites.length === 0) return 1; // যদি কোনো সাইট না থাকে, আইডি হবে ১
+    
+    // বর্তমান সব সাইটের আইডি থেকে সর্বোচ্চ আইডি বের করা
+    const maxId = Math.max(...cat.sites.map(s => s.id));
+    return maxId + 1;
+}
   
       </script>
   </body>
