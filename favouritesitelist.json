@@ -4,24 +4,29 @@
   "total_sites": 7,
   "categories": [
     {
+      "id": 1,
       "name": "Banking",
       "sites": [
         {
+          "id": 1,
           "name": "SBI",
           "url": "https://onlinesbi.sbi",
           "icon": ""
         },
         {
+          "id": 2,
           "name": "Axis",
           "url": "https://axisbank.com",
           "icon": ""
         },
         {
+          "id": 3,
           "name": "ICICI",
           "url": "https://icicibank.com",
           "icon": ""
         },
         {
+          "id": 4,
           "name": "Local Bank",
           "url": "https://localbank.com",
           "icon": "https://png.pngtree.com/png-clipart/20190614/original/pngtree-bank-icon-png-image_3700425.jpg"
@@ -29,19 +34,23 @@
       ]
     },
     {
+      "id": 2,
       "name": "Office & Work",
       "sites": [
         {
+          "id": 1,
           "name": "Google Docs",
           "url": "https://docs.google.com",
           "icon": ""
         },
         {
+          "id": 2,
           "name": "Google Sheets",
           "url": "https://sheets.google.com",
           "icon": ""
         },
         {
+          "id": 3,
           "name": "EditPad",
           "url": "https://editpad.org",
           "icon": ""
