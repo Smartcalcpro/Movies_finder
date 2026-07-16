@@ -1455,16 +1455,10 @@ function saveSite() {
     const newId = parseInt(document.getElementById('favSiteID').value);
     const editIdx = document.getElementById('editIndex').value;
     
-    // চেক: আইডি ফাঁকা কি না
-    if (isNaN(newId)) {
-        alert("Please enter a valid ID!");
-        return;
-    }
-
-    // ইউনিক আইডি চেক: ক্যাটাগরির অন্য সাইটগুলোর সাথে আইডি মিলছে কি না দেখা
+    // ইউনিক আইডি চেক
     const duplicate = cat.sites.find((s, index) => s.id == newId && index != editIdx);
     if (duplicate) {
-        alert("Error: This ID already exists in this category! Please use a unique ID.");
+        alert("Error: ID already exists!");
         return;
     }
     
@@ -1481,10 +1475,9 @@ function saveSite() {
         cat.sites.push(siteData); 
     }
     
-    showToast(editIdx !== "" ? "Site Updated!" : "Site Added!");
     renderSites(); 
-    resetForm();
-    alert("Site saved successfully!");
+    resetForm(); // এখানে অটো আইডি আপডেট হবে
+    showToast(editIdx !== "" ? "Site Updated!" : "Site Added!");
 }
 
 // ৫. সাইট ডিলিট ফাংশন
@@ -1503,6 +1496,8 @@ function resetForm() {
     document.getElementById('favSiteName').value = "";
     document.getElementById('favSiteUrl').value = "";
     document.getElementById('favIconUrl').value = "";
+    
+    // অটোমেটিক নতুন ID জেনারেট করা
     document.getElementById('favSiteID').value = getNextId();
 }
 
@@ -1517,13 +1512,22 @@ function resetForm() {
 }
   
   function getNextId() {
-    const cat = favData.categories.find(c => c.id == document.getElementById('catSelect').value);
-    if (!cat || cat.sites.length === 0) return 1; // যদি কোনো সাইট না থাকে, আইডি হবে ১
+    const select = document.getElementById('catSelect');
+    const cat = favData.categories.find(c => c.id == select.value);
     
-    // বর্তমান সব সাইটের আইডি থেকে সর্বোচ্চ আইডি বের করা
+    if (!cat || !cat.sites || cat.sites.length === 0) return 1;
+    
+    // সর্বোচ্চ আইডি + ১
     const maxId = Math.max(...cat.sites.map(s => s.id));
     return maxId + 1;
 }
+
+  
+// ক্যাটাগরি বদলালে আইডি যেন নিজে থেকে বদলে যায়
+document.getElementById('catSelect').addEventListener('change', function() {
+    document.getElementById('favSiteID').value = getNextId();
+});
+
   
       </script>
   </body>
