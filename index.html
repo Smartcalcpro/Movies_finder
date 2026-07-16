@@ -1407,34 +1407,37 @@ function setupDropdowns() {
 
 // ২. এক্সপোর্ট ফাংশন
 function exportData() {
-    // ১. ডাটা প্রসেসিং: প্রতিটি ক্যাটাগরির সাইটগুলোকে ID অনুযায়ী সাজানো
+    // ১. প্রথমে ক্যাটাগরিগুলোকে আইডি অনুযায়ী সাজানো (Category Sorting)
+    favData.categories.sort((a, b) => a.id - b.id);
+
+    // ২. তারপর প্রতিটি ক্যাটাগরির ভেতরের সাইটগুলোকে আইডি অনুযায়ী সাজানো (Inner Sites Sorting)
     favData.categories.forEach(cat => {
-        cat.sites.sort((a, b) => a.id - b.id);
+        if (cat.sites && cat.sites.length > 0) {
+            cat.sites.sort((a, b) => a.id - b.id);
+        }
     });
 
-    // ২. মেটাডাটা আপডেট
+    // ৩. মেটাডাটা আপডেট
     let v = favData.version.split('.').map(Number);
     v[2] += 1; 
     favData.version = v.join('.');
     favData.last_updated = new Date().toISOString().split('T')[0];
     favData.total_sites = favData.categories.reduce((acc, cat) => acc + cat.sites.length, 0);
     
-    // ৩. এক্সপোর্ট টাইম ফরম্যাট
+    // ৪. ফাইল ডাউনলোড
     const now = new Date();
     const ts = `${now.getDate()}${now.getMonth()+1}${now.getFullYear()}_${now.getHours()}${now.getMinutes()}`;
-    
-    // ৪. ফাইল ডাউনলোড
     const blob = new Blob([JSON.stringify(favData, null, 2)], {type: "application/json"});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `favouritesitelist_${ts}.json`; 
     a.click();
 
-    // ৫. সাকসেস টোস্ট মেসেজ
-    showToast("Data Sorted & Exported Successfully!");
+    // ৫. সাকসেস টোস্ট
+    showToast("Categories & Sites Sorted & Exported!");
 }
 
-
+  
 // ৩. ইমপোর্ট ফাংশন
 function importData(e) {
     const reader = new FileReader();
