@@ -452,7 +452,7 @@ input, select { padding: 6px; border: 1px solid #ccc; border-radius: 6px; }
     margin-bottom: 2px !important; /* গ্যাপ কমানো হয়েছে */
     margin-top: 5px; 
     text-transform: uppercase; 
-    font-size: 12px;
+    font-size: 14px;
 }
 
 /* ইনপুট গ্রুপগুলোর গ্যাপ একদম কমিয়ে দেওয়া */
@@ -466,6 +466,7 @@ input, select { padding: 6px; border: 1px solid #ccc; border-radius: 6px; }
 
 /* ইনপুট ফিল্ডের প্যাডিং কমিয়ে উচ্চতা কমানো */
 #favEditorPopup input {
+    font-size: 1rem !important;
     padding: 5px 7px; /* প্যাডিং কমানো হলো */
     margin: 0;
     border: 1px solid #ccc;
@@ -1406,20 +1407,33 @@ function setupDropdowns() {
 
 // ২. এক্সপোর্ট ফাংশন
 function exportData() {
+    // ১. ডাটা প্রসেসিং: প্রতিটি ক্যাটাগরির সাইটগুলোকে ID অনুযায়ী সাজানো
+    favData.categories.forEach(cat => {
+        cat.sites.sort((a, b) => a.id - b.id);
+    });
+
+    // ২. মেটাডাটা আপডেট
     let v = favData.version.split('.').map(Number);
     v[2] += 1; 
     favData.version = v.join('.');
     favData.last_updated = new Date().toISOString().split('T')[0];
     favData.total_sites = favData.categories.reduce((acc, cat) => acc + cat.sites.length, 0);
     
+    // ৩. এক্সপোর্ট টাইম ফরম্যাট
     const now = new Date();
     const ts = `${now.getDate()}${now.getMonth()+1}${now.getFullYear()}_${now.getHours()}${now.getMinutes()}`;
+    
+    // ৪. ফাইল ডাউনলোড
     const blob = new Blob([JSON.stringify(favData, null, 2)], {type: "application/json"});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `favouritesitelist_${ts}.json`; 
     a.click();
+
+    // ৫. সাকসেস টোস্ট মেসেজ
+    showToast("Data Sorted & Exported Successfully!");
 }
+
 
 // ৩. ইমপোর্ট ফাংশন
 function importData(e) {
