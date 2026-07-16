@@ -41,8 +41,8 @@
     
     /* Search Input */
     input {
-      width: 100%; padding: 12px; margin: 15px 0 5px 0; border: 2px solid #ddd;
-      border-radius: 8px; box-sizing: border-box; font-size: 1rem;
+      width: 100%; padding: 18px; margin: 15px 0 5px 0; border: 2px solid #ddd;
+      border-radius: 8px; box-sizing: border-box; font-size: 1.2rem;
     }
 
     .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
@@ -1274,7 +1274,12 @@ settingsIcon.onclick = () => {
                 <img src="${iconSrc}" width="24" height="24" style="border-radius:4px; display:block; margin: 0 auto;">
                 <div style="font-size: 10px; margin-top: 5px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${site.name}</div>
             `;
-            item.onclick = () => window.open(site.url, '_blank');
+            item.onclick = () => {
+                const win = window.open(site.url, '_blank');
+                if (win) {
+                    childWindows.push(win); // এখন এটি closeAll() এ ট্র্যাক হবে
+                }
+            };
             grid.appendChild(item);
         });
         container.appendChild(grid);
