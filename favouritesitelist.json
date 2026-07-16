@@ -1,10 +1,64 @@
 {
-  "version": "1.0.0",
-  "last_updated": "2026-07-15",
-  "total_sites": 7,
+  "version": "1.0.2",
+  "last_updated": "2026-07-16",
+  "total_sites": 15,
   "categories": [
     {
       "id": 1,
+      "name": "Daily Use",
+      "sites": [
+        {
+          "id": 1,
+          "name": "Gemini",
+          "url": "https://gemini.google.com/app?hl=en-IN",
+          "icon": ""
+        },
+        {
+          "id": 2,
+          "name": "Chatgpt",
+          "url": "https://chatgpt.com/",
+          "icon": ""
+        },
+        {
+          "id": 3,
+          "name": "Copilot ",
+          "url": "https://copilot.microsoft.com/",
+          "icon": ""
+        },
+        {
+          "id": 4,
+          "name": "BG Remover",
+          "url": "https://www.remove.bg/",
+          "icon": ""
+        },
+        {
+          "id": 5,
+          "name": "Cleanup",
+          "url": "https://cleanup.pictures/",
+          "icon": ""
+        },
+        {
+          "id": 6,
+          "name": "Video BG",
+          "url": "https://www.remove.bg/b/remove-video-backgrounds-100-automatically-with-unscreen",
+          "icon": ""
+        },
+        {
+          "id": 7,
+          "name": "Photoshop ",
+          "url": "https://www.photopea.com/",
+          "icon": ""
+        },
+        {
+          "id": 8,
+          "name": "Passport Photo ",
+          "url": "https://www.cutout.pro/passport-photo-maker",
+          "icon": ""
+        }
+      ]
+    },
+    {
+      "id": 2,
       "name": "Banking",
       "sites": [
         {
@@ -34,7 +88,7 @@
       ]
     },
     {
-      "id": 2,
+      "id": 3,
       "name": "Office & Work",
       "sites": [
         {
